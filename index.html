@@ -11,497 +11,333 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Diseño 2025 */
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #FFFBF0;
-            color: #4A4A4A;
+            background-color: #F8F9FA; /* Un blanco más suave */
+            color: #212529; /* Negro suave */
         }
-        /* Estilo Claymorphism / Acuarela Suave */
-        .clay-card {
+        .modern-card {
             background-color: #FFFFFF;
-            border-radius: 20px;
-            box-shadow: 8px 8px 16px rgba(212, 192, 156, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
+            border-radius: 1.25rem; /* 20px */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            border: 1px solid #E5E7EB;
             transition: all 0.3s ease;
         }
-        .clay-button {
-            border-radius: 12px;
-            box-shadow: 4px 4px 8px rgba(212, 192, 156, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8);
+        .modern-button {
+            border-radius: 0.75rem; /* 12px */
+            font-weight: 700;
             transition: all 0.2s ease-in-out;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         }
-        .clay-button:active {
-            box-shadow: inset 4px 4px 8px rgba(212, 192, 156, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
-            transform: translateY(2px);
+        .modern-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
-        .task-checkbox:checked + label {
-            text-decoration: line-through;
-            color: #9CA3AF;
+        .modern-button-primary {
+            background-color: #3B82F6; /* Azul Vibrante */
+            color: white;
         }
+        .modern-button-secondary {
+            background-color: #E5E7EB;
+            color: #374151;
+        }
+
+        .task-checkbox:checked + label { text-decoration: line-through; color: #9CA3AF; }
         .task-checkbox:checked + label svg.icon-unchecked { display: none; }
         .task-checkbox:checked + label svg.icon-checked { display: inline-block; }
         .progress-bar-fill { transition: width 0.5s ease-in-out; }
 
         /* Modo Noche */
-        .dark-mode { background-color: #1A202C; color: #E2E8F0; }
-        .dark-mode .clay-card { background-color: #2D3748; box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3), -8px -8px 16px rgba(74, 85, 104, 0.2); }
-        .dark-mode .clay-button { background-color: #4A5568; box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3), -4px -4px 8px rgba(74, 85, 104, 0.2); }
-        .dark-mode .clay-button:active { box-shadow: inset 4px 4px 8px rgba(0,0,0, 0.3), inset -4px -4px 8px rgba(74, 85, 104, 0.2); }
-        .dark-mode .text-gray-800 { color: #E2E8F0; } .dark-mode .text-gray-500 { color: #A0AEC0; }
-        .dark-mode .text-amber-600 { color: #F6E05E; } .dark-mode .bg-amber-100 { background-color: #4A5568; }
-        .dark-mode .bg-sky-100 { background-color: #4A5568; } .dark-mode .bg-indigo-100 { background-color: #4A5568; }
+        .dark-mode { background-color: #111827; color: #F9FAFB; }
+        .dark-mode .modern-card { background-color: #1F2937; border-color: #374151; }
+        .dark-mode .modern-button-secondary { background-color: #374151; color: #F9FAFB; }
+        .dark-mode .text-gray-800 { color: #F9FAFB; } .dark-mode .text-gray-500 { color: #9CA3AF; }
+        .dark-mode .text-amber-500 { color: #FBBF24; }
+        .dark-mode .bg-blue-100 { background-color: #1E40AF; }
+        .dark-mode .bg-green-100 { background-color: #065F46; }
+        .dark-mode .bg-purple-100 { background-color: #5B21B6; }
+        .dark-mode .day-selector.bg-white { background-color: #374151; }
         
-        .input-error { border-color: #EF4444 !important; animation: shake 0.5s; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        .error-message { color: #EF4444; font-size: 0.875rem; min-height: 1.25rem; }
-
-        /* Animaciones Tareas */
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        .task-item { animation: fadeIn 0.3s ease-out; }
-        .dragging { opacity: 0.5; }
-        .drag-over { border-top: 2px dashed #FBBF24; }
-
-        /* Ocultar en impresión */
-        @media print {
-            .no-print { display: none; }
-            body { background-color: #FFFFFF; }
-            .clay-card { box-shadow: none; border: 1px solid #ddd; }
-            .print-header { display: block !important; text-align: center; margin-bottom: 2rem; }
-            .task-item { page-break-inside: avoid; }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .task-item, .reward-item { animation: fadeIn 0.3s ease-out; }
+        .dragging { opacity: 0.5; background-color: #FEF3C7; }
+        .drag-over { border-top: 2px dashed #3B82F6; }
     </style>
 </head>
 <body class="transition-colors duration-500">
 
-    <div id="app" class="max-w-4xl mx-auto p-4 md:p-6"></div>
+    <div id="app" class="max-w-5xl mx-auto p-4 md:p-6"></div>
 
     <!-- Modals -->
-    <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="clay-card p-6 md:p-8 w-full max-w-md text-center">
-            <h2 class="text-2xl md:text-3xl font-bold text-amber-600 mb-4">¡Bienvenido/a!</h2>
+    <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="modern-card p-6 md:p-8 w-full max-w-md text-center">
+            <h2 class="text-2xl md:text-3xl font-bold text-blue-500 mb-4">¡Bienvenido/a!</h2>
             <p class="text-gray-500 mb-6">Vamos a configurar tu rutina divertida.</p>
-            <div class="mb-4">
-                <label for="child-name" class="block text-left font-bold mb-2">Nombre del niño/a:</label>
-                <input type="text" id="child-name" placeholder="Ej: Leo" class="w-full p-3 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-400 focus:outline-none transition-colors">
-                <p id="name-error" class="error-message text-left mt-1"></p>
+            <div class="mb-4 text-left">
+                <label for="child-name" class="block font-bold mb-2">Nombre del niño/a:</label>
+                <input type="text" id="child-name" placeholder="Ej: Leo" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors">
             </div>
-            <div class="mb-4">
-                <label class="block text-left font-bold mb-2">Elige un avatar:</label>
-                <div id="avatar-selection" class="flex justify-center space-x-4"></div>
+            <div class="mb-4 text-left">
+                <label class="block font-bold mb-2">Elige un avatar:</label>
+                <div id="avatar-selection" class="flex justify-center flex-wrap gap-4"></div>
             </div>
-            <div class="mb-6">
-                <label for="routine-select" class="block text-left font-bold mb-2">Elige una rutina base:</label>
-                <select id="routine-select" class="w-full p-3 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-400 focus:outline-none bg-white">
+            <div class="mb-6 text-left">
+                <label for="routine-select" class="block font-bold mb-2">Elige una rutina base:</label>
+                <select id="routine-select" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
                     <option value="toddler">Pequeños (2-3 años)</option>
                     <option value="preschooler">Grandes (4-5 años)</option>
                 </select>
             </div>
-            <button id="start-button" class="clay-button bg-amber-400 text-white font-bold py-3 px-8 text-lg rounded-lg w-full">¡Empezar a Jugar!</button>
+            <button id="start-button" class="modern-button modern-button-primary py-3 px-8 text-lg w-full">¡Empezar a Jugar!</button>
         </div>
     </div>
     
-    <div id="rewards-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50 no-print">
-        <div class="clay-card p-6 md:p-8 w-full max-w-lg text-center relative">
-            <button id="close-rewards-button" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-            <h2 class="text-2xl md:text-3xl font-bold text-amber-600 mb-2">¡Mis Recompensas!</h2>
-            <p class="text-gray-500 mb-6">Has ganado estas medallas y stickers por tu gran trabajo.</p>
-            <div id="rewards-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-4 max-h-80 overflow-y-auto p-4 bg-amber-50 rounded-lg"></div>
+    <div id="rewards-store-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 no-print">
+        <div class="modern-card p-6 md:p-8 w-full max-w-2xl text-center relative max-h-[90vh] flex flex-col">
+            <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-gray-800">&times;</button>
+            <h2 class="text-2xl md:text-3xl font-bold text-blue-500 mb-2">Tienda de Recompensas</h2>
+            <p class="text-gray-500 mb-6">¡Usa tus estrellas para conseguir premios geniales!</p>
+            <div id="rewards-store-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto p-4 bg-gray-50 rounded-lg"></div>
         </div>
     </div>
-
-    <div id="library-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50 no-print">
-        <div class="clay-card p-6 md:p-8 w-full max-w-2xl text-center relative max-h-[90vh] flex flex-col">
-            <button id="close-library-button" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-            <h2 class="text-2xl md:text-3xl font-bold text-amber-600 mb-4">Biblioteca de Tareas</h2>
-            <p class="text-gray-500 mb-6">Toca una tarea para añadirla a la lista.</p>
-            <div id="library-content" class="overflow-y-auto text-left"></div>
-        </div>
-    </div>
-
-    <div id="copy-routine-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50 no-print">
-        <div class="clay-card p-6 md:p-8 w-full max-w-md text-center">
-             <button id="close-copy-button" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-            <h2 class="text-xl md:text-2xl font-bold text-amber-600 mb-4">Copiar Rutina del <span id="copy-day-name"></span></h2>
-            <p class="text-gray-500 mb-6">Selecciona los días a los que quieres copiar esta rutina.</p>
-            <div id="copy-days-selection" class="grid grid-cols-2 gap-4 text-left mb-6"></div>
-            <button id="confirm-copy-btn" class="clay-button bg-sky-500 text-white font-bold py-2 px-6 rounded-lg">Copiar a seleccionados</button>
-        </div>
-    </div>
-
-    <div id="logout-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50 no-print">
-        <div class="clay-card p-6 md:p-8 w-full max-w-sm text-center">
-            <h2 class="text-xl md:text-2xl font-bold text-amber-600 mb-4">¿Cerrar Sesión?</h2>
-            <p class="text-gray-500 mb-6">Se borrarán todos los datos guardados. ¿Estás seguro?</p>
-            <div class="flex justify-center space-x-4">
-                <button id="confirm-logout-btn" class="clay-button bg-red-500 text-white font-bold py-2 px-6 rounded-lg">Sí, cerrar</button>
-                <button id="cancel-logout-btn" class="clay-button bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg">No, cancelar</button>
+    
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 no-print">
+         <div class="modern-card p-6 md:p-8 w-full max-w-lg text-center relative max-h-[90vh] flex flex-col">
+            <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-gray-800">&times;</button>
+            <h2 class="text-2xl md:text-3xl font-bold text-blue-500 mb-4">Ajustes</h2>
+            <div class="text-left overflow-y-auto">
+                <h3 class="font-bold text-lg mb-2">Gestionar Recompensas de la Tienda</h3>
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+                        <div class="flex flex-col"><label for="reward-text" class="text-sm font-bold">Nombre</label><input type="text" id="reward-text" class="p-2 rounded border" placeholder="30 min. de tablet"></div>
+                        <div class="flex flex-col"><label for="reward-icon" class="text-sm font-bold">Icono</label><input type="text" id="reward-icon" class="p-2 rounded border" placeholder="📱"></div>
+                        <div class="flex flex-col"><label for="reward-cost" class="text-sm font-bold">Coste (🌟)</label><input type="number" id="reward-cost" class="p-2 rounded border" placeholder="20"></div>
+                    </div>
+                     <button id="add-reward-btn" class="modern-button modern-button-primary w-full mt-3 py-2">Añadir Recompensa</button>
+                </div>
+                <div id="custom-rewards-list"></div>
             </div>
         </div>
     </div>
+    
+    <!-- Other Modals (Library, Copy, Logout) -->
+    <div id="library-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 no-print"> <div class="modern-card p-6 md:p-8 w-full max-w-2xl relative max-h-[90vh] flex flex-col"><button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-gray-800">&times;</button><h2 class="text-2xl md:text-3xl font-bold text-blue-500 mb-4 text-center">Biblioteca de Tareas</h2><div id="library-content" class="overflow-y-auto text-left"></div></div></div>
+    <div id="copy-routine-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 no-print"><div class="modern-card p-6 md:p-8 w-full max-w-md text-center"><button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-gray-800">&times;</button><h2 class="text-xl md:text-2xl font-bold text-blue-500 mb-4">Copiar Rutina del <span id="copy-day-name"></span></h2><p class="text-gray-500 mb-6">Selecciona los días a los que quieres copiar esta rutina.</p><div id="copy-days-selection" class="grid grid-cols-2 gap-4 text-left mb-6"></div><button id="confirm-copy-btn" class="modern-button modern-button-primary py-2 px-6">Copiar</button></div></div>
+    <div id="logout-confirm-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 no-print"><div class="modern-card p-6 md:p-8 w-full max-w-sm text-center"><h2 class="text-xl md:text-2xl font-bold text-red-500 mb-4">¿Cerrar Sesión?</h2><p class="text-gray-500 mb-6">Se borrarán todos los datos. ¿Estás seguro?</p><div class="flex justify-center space-x-4"><button id="confirm-logout-btn" class="modern-button bg-red-500 text-white py-2 px-6">Sí, cerrar</button><button id="cancel-logout-btn" class="modern-button modern-button-secondary py-2 px-6">Cancelar</button></div></div></div>
 
-    <div id="notification-modal" class="fixed top-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg transform translate-x-[calc(100%+1.25rem)] transition-transform duration-500 z-50 no-print">
-        <p id="notification-text" class="font-bold"></p>
-    </div>
+    <div id="notification-modal" class="fixed top-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg transform translate-x-[calc(100%+1.25rem)] transition-transform duration-500 z-50 no-print"><p id="notification-text" class="font-bold"></p></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // DOM Elements
-            const app = document.getElementById('app');
-            const setupModal = document.getElementById('setup-modal');
-            const rewardsModal = document.getElementById('rewards-modal');
-            const libraryModal = document.getElementById('library-modal');
-            const logoutConfirmModal = document.getElementById('logout-confirm-modal');
-            const copyRoutineModal = document.getElementById('copy-routine-modal');
-            const startButton = document.getElementById('start-button');
-            const childNameInput = document.getElementById('child-name');
-            const avatarSelection = document.getElementById('avatar-selection');
-            
-            // Services
+            const $ = (selector) => document.querySelector(selector);
+            const $$ = (selector) => document.querySelectorAll(selector);
+
+            const modals = {
+                setup: $('#setup-modal'),
+                rewardsStore: $('#rewards-store-modal'),
+                library: $('#library-modal'),
+                logout: $('#logout-confirm-modal'),
+                copy: $('#copy-routine-modal'),
+                settings: $('#settings-modal'),
+            };
+
             const synth = window.speechSynthesis;
             let sound;
-            try {
-                sound = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
-            } catch (e) {
-                console.error("Tone.js failed to load. Sound features will be disabled.", e);
-                sound = { triggerAttackRelease: () => {} };
-            }
+            try { sound = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination(); } 
+            catch (e) { console.error("Tone.js failed", e); sound = { triggerAttackRelease: () => {} }; }
 
-            // Data
-            const avatars = {
-                bunny: { name: 'Conejito', emoji: '🐰' }, bear: { name: 'Osito', emoji: '🐻' },
-                monster: { name: 'Monstruito', emoji: '👾' }, dino: { name: 'Dinosaurio', emoji: '🦖' },
-                fox: { name: 'Zorro', emoji: '🦊' }, panda: { name: 'Panda', emoji: '🐼' }
-            };
-            
-            const rewards = [
-                { id: 'star', emoji: '🌟', name: 'Primera Tarea', needed: 1 }, { id: 'thumbsup', emoji: '👍', name: 'Buen Comienzo', needed: 5 },
-                { id: 'medal', emoji: '🏅', name: 'Día Completo', needed: 10 }, { id: 'rocket', emoji: '🚀', name: 'Súper Rápido', needed: 15 },
-                { id: 'trophy', emoji: '🏆', name: 'Semana Genial', needed: 25 }, { id: 'gem', emoji: '💎', name: 'Imparable', needed: 50 },
-                { id: 'crown', emoji: '👑', name: 'Rey/Reina', needed: 100 }, { id: 'heart', emoji: '💖', name: 'Corazón de oro', needed: 125 },
-                { id: 'confetti', emoji: '🎉', name: 'Fiesta', needed: 150 }, { id: 'brain', emoji: '🧠', name: 'Genio', needed: 175 },
-                { id: 'superhero', emoji: '🦸', name: 'Superhéroe', needed: 200 }
-            ];
-
-            const taskLibrary = {
-                higiene: [
-                    { text: 'Ir al baño y tirar la cadena', icon: '🚽' }, { text: 'Lavarse las manos con jabón', icon: '🧼' },
-                    { text: 'Lavarse los dientes', icon: '🦷' }, { text: 'Peinarse el pelo', icon: '🎀' },
-                    { text: 'Darse un baño o ducha', icon: '🛁' }, { text: 'Ponerse crema', icon: '🧴' },
-                ],
-                vestimenta: [
-                    { text: 'Ponerse la ropa de día', icon: '👕' }, { text: 'Ponerse el pijama', icon: '🌙' },
-                    { text: 'Elegir la ropa para mañana', icon: '🤔' }, { text: 'Ponerse los zapatos', icon: '👟' },
-                    { text: 'Poner la ropa sucia en el cesto', icon: '🧺' },
-                ],
-                comidas: [
-                    { text: 'Desayunar', icon: '🥣' }, { text: 'Comer el almuerzo', icon: '🥗' },
-                    { text: 'Tomar la merienda', icon: '🍎' }, { text: 'Cenar en familia', icon: '🍽️' },
-                    { text: 'Ayudar a poner la mesa', icon: '🍴' }, { text: 'Ayudar a levantar la mesa', icon: '🧼' },
-                    { text: 'Beber agua', icon: '💧' },
-                ],
-                responsabilidades: [
-                    { text: 'Ordenar los juguetes', icon: '📦' }, { text: 'Hacer la cama', icon: '🛏️' },
-                    { text: 'Darle comida a la mascota', icon: '🐾' }, { text: 'Regar las plantas', icon: '🌱' },
-                    { text: 'Ayudar a guardar la compra', icon: '🛒' },
-                ],
-                calmaYDescanso: [
-                    { text: 'Leer un cuento', icon: '📖' }, { text: 'Momento de tranquilidad', icon: '🧘' },
-                    { text: 'Escuchar música relajante', icon: '🎶' }, { text: 'Abrazos y mimos', icon: '🤗' },
-                    { text: 'Ir a la cama a descansar', icon: '😴' }, { text: 'Despertar y estirarse', icon: '☀️' }
-                ],
-                juegoYAprendizaje: [
-                    { text: 'Jugar libremente', icon: '🧸' }, { text: 'Hacer una manualidad', icon: '🎨' },
-                    { text: 'Jugar al aire libre', icon: '🌳' }, { text: 'Hacer las tareas de la escuela', icon: '📚' },
-                    { text: 'Practicar letras o números', icon: '🔢' },
-                ]
-            };
-            const routines = {
-                toddler: { name: "Pequeños (2-3 años)", tasks: { AM: [ taskLibrary.calmaYDescanso[5], taskLibrary.higiene[0], taskLibrary.higiene[2], taskLibrary.vestimenta[0], taskLibrary.comidas[0] ], PM: [ taskLibrary.comidas[1], taskLibrary.juegoYAprendizaje[0], taskLibrary.responsabilidades[0], taskLibrary.comidas[2] ], Noche: [ taskLibrary.comidas[3], taskLibrary.vestimenta[1], taskLibrary.higiene[2], taskLibrary.calmaYDescanso[0], taskLibrary.calmaYDescanso[4] ] } },
-                preschooler: { name: "Grandes (4-5 años)", tasks: { AM: [ taskLibrary.responsabilidades[1], taskLibrary.higiene[0], taskLibrary.higiene[2], taskLibrary.vestimenta[0], taskLibrary.comidas[0], taskLibrary.responsabilidades[2] ], PM: [ taskLibrary.comidas[1], taskLibrary.juegoYAprendizaje[3], taskLibrary.juegoYAprendizaje[1], taskLibrary.responsabilidades[0] ], Noche: [ taskLibrary.comidas[4], taskLibrary.comidas[3], taskLibrary.vestimenta[1], taskLibrary.higiene[2], taskLibrary.vestimenta[2], taskLibrary.calmaYDescanso[0], taskLibrary.calmaYDescanso[4] ] } }
-            };
-            let state = {};
+            const avatars = { bunny: { name: 'Conejito', emoji: '🐰' }, bear: { name: 'Osito', emoji: '🐻' }, monster: { name: 'Monstruito', emoji: '👾' }, dino: { name: 'Dinosaurio', emoji: '🦖' }, fox: { name: 'Zorro', emoji: '🦊' }, panda: { name: 'Panda', emoji: '🐼' } };
             const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-            let currentPeriodForLibrary = 'AM';
+            let state = {};
             let draggedTask = null;
 
-            function resetState() {
-                state = {
-                    childName: '', avatar: 'bunny',
-                    currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' }).replace(/^\w/, c => c.toUpperCase()),
-                    darkMode: false, tasks: {}, completedCount: 0
+            // --- DATA & STATE ---
+            function generateTaskLibrary() {
+                const lib = {
+                    higiene: [{ t: 'Ir al baño y tirar la cadena', i: '🚽' }, { t: 'Lavarse las manos con jabón', i: '🧼' }, { t: 'Lavarse los dientes', i: '🦷' }, { t: 'Peinarse el pelo', i: '🎀' }, { t: 'Darse un baño o ducha', i: '🛁' }],
+                    vestimenta: [{ t: 'Ponerse la ropa de día', i: '👕' }, { t: 'Ponerse el pijama', i: '🌙' }, { t: 'Elegir la ropa para mañana', i: '🤔' }, { t: 'Ponerse los zapatos', i: '👟' }, { t: 'Poner la ropa sucia en el cesto', i: '🧺' }],
+                    comidas: [{ t: 'Desayunar', i: '🥣' }, { t: 'Comer el almuerzo', i: '🥗' }, { t: 'Tomar la merienda', i: '🍎' }, { t: 'Cenar en familia', i: '🍽️' }, { t: 'Ayudar a poner la mesa', i: '🍴' }, { t: 'Beber agua', i: '💧' }],
+                    responsabilidades: [{ t: 'Ordenar los juguetes', i: '📦' }, { t: 'Hacer la cama', i: '🛏️' }, { t: 'Darle comida a la mascota', i: '🐾' }, { t: 'Regar las plantas', i: '🌱' }],
+                    calmaYDescanso: [{ t: 'Leer un cuento', i: '📖' }, { t: 'Momento de tranquilidad', i: '🧘' }, { t: 'Escuchar música relajante', i: '🎶' }, { t: 'Abrazos y mimos', i: '🤗' }, { t: 'Ir a la cama a descansar', i: '😴' }, { t: 'Despertar y estirarse', i: '☀️' }],
+                    juegoYAprendizaje: [{ t: 'Jugar libremente', i: '🧸' }, { t: 'Hacer una manualidad', i: '🎨' }, { t: 'Jugar al aire libre', i: '🌳' }, { t: 'Hacer las tareas de la escuela', i: '📚' }]
                 };
+                Object.values(lib).forEach(category => category.forEach(task => { task.stars = 1; }));
+                return lib;
             }
+            const taskLibrary = generateTaskLibrary();
 
+            const routines = {
+                toddler: { AM: [ taskLibrary.calmaYDescanso[5], taskLibrary.higiene[0], taskLibrary.higiene[2], taskLibrary.vestimenta[0], taskLibrary.comidas[0] ], PM: [ taskLibrary.comidas[1], taskLibrary.juegoYAprendizaje[0], taskLibrary.responsabilidades[0], taskLibrary.comidas[2] ], Noche: [ taskLibrary.comidas[3], taskLibrary.vestimenta[1], taskLibrary.higiene[2], taskLibrary.calmaYDescanso[0], taskLibrary.calmaYDescanso[4] ] },
+                preschooler: { AM: [ taskLibrary.responsabilidades[1], taskLibrary.higiene[0], taskLibrary.higiene[2], taskLibrary.vestimenta[0], taskLibrary.comidas[0] ], PM: [ taskLibrary.comidas[1], taskLibrary.juegoYAprendizaje[3], taskLibrary.responsabilidades[0] ], Noche: [ taskLibrary.comidas[3], taskLibrary.vestimenta[1], taskLibrary.higiene[2], taskLibrary.calmaYDescanso[0], taskLibrary.calmaYDescanso[4] ] }
+            };
+
+            function resetState() { state = { childName: '', avatar: 'bunny', currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' }).replace(/^\w/, c => c.toUpperCase()), darkMode: false, tasks: {}, starBalance: 0, customRewards: [] }; }
+            function saveState() { localStorage.setItem('miRutinaDivertida_v2', JSON.stringify(state)); }
+            function loadState() {
+                const savedState = localStorage.getItem('miRutinaDivertida_v2');
+                if (savedState) { state = JSON.parse(savedState); if(state.darkMode) document.body.classList.add('dark-mode'); } 
+                else { resetState(); }
+            }
+            
+            // --- INITIALIZATION ---
             function initialize() {
                 loadState();
                 renderAvatars();
                 renderTaskLibrary();
-
-                if (state.childName) {
-                    setupModal.style.display = 'none';
-                    renderApp();
-                }
-
-                startButton.addEventListener('click', () => {
-                    const name = childNameInput.value.trim();
-                    if (name === '') {
-                        childNameInput.classList.add('input-error');
-                        document.getElementById('name-error').textContent = 'Por favor, ingresa un nombre.';
-                        return;
-                    }
-                    childNameInput.classList.remove('input-error');
-                    document.getElementById('name-error').textContent = '';
-
-                    state.childName = name;
-                    state.avatar = document.querySelector('input[name="avatar"]:checked').value;
-                    initializeTasksForWeek();
+                if (state.childName) { modals.setup.style.display = 'none'; renderApp(); }
+                $('#start-button').addEventListener('click', () => {
+                    state.childName = $('#child-name').value.trim();
+                    if (!state.childName) return;
+                    state.avatar = $('input[name="avatar"]:checked').value;
+                    if(Object.keys(state.tasks).length === 0) initializeTasksForWeek();
+                    modals.setup.style.display = 'none';
                     saveAndRender();
-                    setupModal.style.display = 'none';
                 });
             }
-
             function initializeTasksForWeek() {
-                if (Object.keys(state.tasks).length > 0) return;
-                const selectedRoutine = routines[document.getElementById('routine-select').value].tasks;
+                const selectedRoutine = routines[$('#routine-select').value];
                 daysOfWeek.forEach(day => { state.tasks[day] = JSON.parse(JSON.stringify(selectedRoutine)); });
-            }
-
-            function saveState() { localStorage.setItem('miRutinaDivertida', JSON.stringify(state)); }
-            function loadState() {
-                const savedState = localStorage.getItem('miRutinaDivertida');
-                if (savedState) {
-                    state = JSON.parse(savedState);
-                    if (state.darkMode) document.body.classList.add('dark-mode');
-                } else {
-                    resetState();
-                }
-            }
-            function isDayComplete(day) {
-                const dayTasks = state.tasks[day];
-                if (!dayTasks) return false;
-                const allTasks = [...dayTasks.AM, ...dayTasks.PM, ...dayTasks.Noche];
-                return allTasks.length > 0 && allTasks.every(t => t.done);
             }
 
             // --- RENDER FUNCTIONS ---
             function renderApp() {
-                const dayTasks = state.tasks[state.currentDay] || JSON.parse(JSON.stringify(routines.toddler.tasks));
+                const dayTasks = state.tasks[state.currentDay] || routines.toddler;
                 const allDayTasks = [...dayTasks.AM, ...dayTasks.PM, ...dayTasks.Noche];
-                const completedTasks = allDayTasks.filter(t => t.done).length;
-                const progress = allDayTasks.length > 0 ? (completedTasks / allDayTasks.length) * 100 : 0;
-
-                app.innerHTML = `
-                    <header class="clay-card p-4 mb-6 text-center no-print">
-                         <div class="flex justify-between items-center mb-4">
-                            <button id="rewards-button" class="text-3xl hover:transform hover:scale-110 transition-transform" title="Mis Recompensas">🏅</button>
-                            <div class="text-center">
-                                <div class="text-5xl">${avatars[state.avatar].emoji}</div>
-                                <h1 class="text-2xl font-bold text-gray-800">Hola, ${state.childName}!</h1>
-                            </div>
-                            <div class="flex flex-col items-center space-y-2">
-                                <button id="toggle-dark-mode" class="text-2xl hover:transform hover:scale-110 transition-transform" title="Modo Noche">${state.darkMode ? '☀️' : '🌙'}</button>
-                                <button id="print-button" class="text-2xl hover:transform hover:scale-110 transition-transform" title="Imprimir">🖨️</button>
-                                <button id="logout-button" class="text-2xl hover:transform hover:scale-110 transition-transform" title="Cerrar Sesión">🚪</button>
+                const progress = allDayTasks.length > 0 ? (allDayTasks.filter(t => t.done).length / allDayTasks.length) * 100 : 0;
+                
+                $('#app').innerHTML = `
+                    <header class="modern-card p-4 mb-6 text-center no-print">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center gap-2">${Object.keys(avatars).map(key => `<div class="${state.avatar === key ? '' : 'hidden'} text-5xl">${avatars[key].emoji}</div>`).join('')} <div><p class="text-gray-500">Rutina de</p><h1 class="text-2xl font-bold text-gray-800">${state.childName}</h1></div> </div>
+                            <div class="flex items-center justify-center bg-amber-100 rounded-full px-4 py-1 shadow-inner"><span class="text-2xl font-bold text-amber-600">${state.starBalance}</span><span class="text-3xl ml-1">🌟</span></div>
+                            <div class="flex items-center space-x-2">
+                                <button id="rewards-store-btn" class="modern-button bg-white p-3" title="Tienda de Recompensas">🎁</button>
+                                <button id="settings-btn" class="modern-button bg-white p-3" title="Ajustes">⚙️</button>
+                                <button id="logout-btn" class="modern-button bg-white p-3" title="Cerrar Sesión">🚪</button>
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <p class="text-gray-500 mb-2 font-semibold">Progreso Semanal:</p>
-                            <div class="flex justify-center space-x-2">${daysOfWeek.map(day => `<div class="flex flex-col items-center"><span class="text-xs font-bold">${day.substring(0,3)}</span><span class="text-2xl">${isDayComplete(day) ? '🌟' : '⚪'}</span></div>`).join('')}</div>
-                        </div>
-                        <p class="text-gray-500 mb-2">Tu progreso de hoy:</p>
-                        <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-gradient-to-r from-yellow-400 to-amber-500 h-4 rounded-full progress-bar-fill" style="width: ${progress}%"></div></div>
+                        <div class="mb-4"><p class="text-gray-500 mb-2 font-semibold">Progreso Semanal:</p><div class="flex justify-center space-x-2">${daysOfWeek.map(day => `<div class="flex flex-col items-center"><span class="text-xs font-bold">${day.substring(0,3)}</span><span class="text-2xl">${isDayComplete(day) ? '🌟' : '⚪'}</span></div>`).join('')}</div></div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-blue-500 h-2.5 rounded-full progress-bar-fill" style="width: ${progress}%"></div></div>
                     </header>
                     <div class="flex justify-between items-center mb-6 no-print">
-                        <div class="flex space-x-2 overflow-x-auto pb-2">${daysOfWeek.map(day => `<button class="day-selector clay-button text-sm sm:text-base font-bold py-2 px-4 whitespace-nowrap ${state.currentDay === day ? 'bg-amber-400 text-white' : 'bg-white'}" data-day="${day}">${day}</button>`).join('')}</div>
-                        <button id="copy-day-btn" class="clay-button bg-sky-400 text-white font-bold p-2 ml-2" title="Copiar rutina del día">📋</button>
+                        <div class="flex space-x-2 overflow-x-auto pb-2">${daysOfWeek.map(day => `<button class="day-selector modern-button text-sm sm:text-base py-2 px-4 whitespace-nowrap ${state.currentDay === day ? 'modern-button-primary' : 'bg-white'}" data-day="${day}">${day}</button>`).join('')}</div>
+                        <button id="copy-day-btn" class="modern-button modern-button-secondary p-2 ml-2" title="Copiar rutina del día">📋</button>
                     </div>
-                    <main class="grid md:grid-cols-3 gap-6">${renderTaskList('AM', 'Mañana', dayTasks.AM)} ${renderTaskList('PM', 'Tarde', dayTasks.PM)} ${renderTaskList('Noche', 'Noche', dayTasks.Noche)}</main>
-                `;
+                    <main class="grid md:grid-cols-3 gap-6">${renderTaskList('AM', 'Mañana', dayTasks.AM)} ${renderTaskList('PM', 'Tarde', dayTasks.PM)} ${renderTaskList('Noche', 'Noche', dayTasks.Noche)}</main>`;
                 addEventListeners();
-            }
-            
-            function renderAvatars() {
-                avatarSelection.innerHTML = Object.keys(avatars).map((key, index) => `<div><input type="radio" id="avatar-${key}" name="avatar" value="${key}" class="hidden" ${index === 0 ? 'checked' : ''}><label for="avatar-${key}" class="cursor-pointer p-3 rounded-full border-4 border-transparent text-5xl transition-all duration-200 hover:bg-amber-100">${avatars[key].emoji}</label><p class="text-sm font-bold">${avatars[key].name}</p></div>`).join('');
-                document.querySelectorAll('input[name="avatar"]').forEach(radio => radio.addEventListener('change', () => {
-                    document.querySelectorAll('label[for^="avatar-"]').forEach(label => label.style.cssText = "border-color: transparent; background-color: transparent;");
-                    if (radio.checked) document.querySelector(`label[for="${radio.id}"]`).style.cssText = "border-color: #FBBF24; background-color: #FEF3C7;";
-                }));
-                document.querySelector('input[name="avatar"]:checked+label').style.cssText = "border-color: #FBBF24; background-color: #FEF3C7;";
             }
 
             function renderTaskList(period, title, tasks) {
-                const colors = { AM: 'bg-amber-100', PM: 'bg-sky-100', Noche: 'bg-indigo-100' };
+                const colors = { AM: 'bg-blue-100', PM: 'bg-green-100', Noche: 'bg-purple-100' };
                 return `
-                    <div class="clay-card p-4">
+                    <div class="modern-card p-4 flex flex-col">
                         <h2 class="text-xl font-extrabold text-center mb-4 ${colors[period]} rounded-lg py-2">${title}</h2>
-                        <ul class="space-y-3 task-list" data-period="${period}">${tasks.map((task, index) => renderTaskItem(task, period, index)).join('')}</ul>
-                        <div class="mt-4"><div class="flex space-x-2"><input type="text" id="new-task-${period}" class="w-full p-2 border-2 border-gray-200 rounded-lg" placeholder="Tarea personalizada..."><button class="add-task-btn clay-button bg-green-400 text-white px-4 font-bold" data-period="${period}">+</button></div><button class="open-library-btn clay-button bg-sky-400 text-white w-full mt-2 py-2 font-bold" data-period="${period}">Añadir desde Biblioteca</button></div>
+                        <ul class="space-y-3 task-list flex-grow" data-period="${period}">${tasks.map((task, index) => renderTaskItem(task, period, index)).join('')}</ul>
+                        <div class="mt-4"><div class="flex space-x-2"><input type="text" id="new-task-${period}" class="w-full p-2 border-2 border-gray-200 rounded-lg" placeholder="Nueva tarea..."><button class="add-task-btn modern-button modern-button-primary px-4" data-period="${period}">+</button></div><button class="open-library-btn modern-button modern-button-secondary w-full mt-2 py-2" data-period="${period}">Añadir de Biblioteca</button></div>
                     </div>`;
             }
-
-            function renderTaskItem(task, period, index) {
-                return `<li class="task-item flex items-center bg-white p-2 rounded-lg shadow-inner cursor-move ${task.done ? 'opacity-60' : ''}" draggable="true" data-period="${period}" data-index="${index}"><input type="checkbox" id="task-${period}-${index}" class="hidden task-checkbox" ${task.done ? 'checked' : ''} data-period="${period}" data-index="${index}"><label for="task-${period}-${index}" class="flex items-center grow cursor-pointer"><span class="text-3xl mr-3">${task.icon}</span><span class="grow text-gray-700 font-semibold" contenteditable="true" data-period="${period}" data-index="${index}">${task.text}</span><div class="flex-none w-8 h-8 mr-2 flex items-center justify-center"><svg class="icon-unchecked w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><svg class="icon-checked hidden w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div></label><button class="speak-btn text-gray-400 hover:text-blue-500 text-xl" data-text="${task.icon} ${task.text}">🔊</button><button class="delete-btn text-gray-400 hover:text-red-500 text-xl ml-1" data-period="${period}" data-index="${index}">🗑️</button></li>`;
-            }
-            
+            function renderTaskItem(task, period, index) { return `<li class="task-item flex items-center bg-gray-50 p-2 rounded-lg shadow-sm cursor-move ${task.done ? 'opacity-50' : ''}" draggable="true" data-period="${period}" data-index="${index}"><input type="checkbox" id="task-${period}-${index}" class="hidden task-checkbox" ${task.done ? 'checked' : ''} data-period="${period}" data-index="${index}"><label for="task-${period}-${index}" class="flex items-center grow cursor-pointer"><span class="text-3xl mr-3">${task.i}</span><span class="grow text-gray-700 font-semibold" contenteditable="true" data-period="${period}" data-index="${index}">${task.t}</span><div class="flex-none w-8 h-8 mr-2 flex items-center justify-center"><svg class="icon-unchecked w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><svg class="icon-checked hidden w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div></label><button class="speak-btn text-gray-400 hover:text-blue-500 text-xl" data-text="${task.t}">🔊</button><button class="delete-btn text-gray-400 hover:text-red-500 text-xl ml-1" data-period="${period}" data-index="${index}">🗑️</button></li>`; }
+            function renderAvatars() { $('#avatar-selection').innerHTML = Object.keys(avatars).map((key, i) => `<div><input type="radio" id="avatar-${key}" name="avatar" value="${key}" class="hidden" ${i === 0 ? 'checked' : ''}><label for="avatar-${key}" class="cursor-pointer p-2 rounded-full border-4 border-transparent text-5xl transition-all duration-200 hover:bg-blue-100">${avatars[key].emoji}</label></div>`).join(''); }
             function renderTaskLibrary() {
-                const libraryContent = document.getElementById('library-content');
-                const categoryNames = { higiene: "Higiene", vestimenta: "Vestimenta", comidas: "Comidas", responsabilidades: "Responsabilidades", calmaYDescanso: "Calma y Descanso", juegoYAprendizaje: "Juego y Aprendizaje" };
-                libraryContent.innerHTML = Object.keys(taskLibrary).map(cat => `<div class="mb-4"><h3 class="text-lg font-bold text-left text-amber-700 p-1">${categoryNames[cat]}</h3><div class="flex flex-wrap">${taskLibrary[cat].map(task => `<button class="library-task-btn clay-button bg-white p-2 m-1 flex items-center text-left" data-text="${task.text}" data-icon="${task.icon}"><span class="text-2xl mr-2">${task.icon}</span><span class="font-semibold">${task.text}</span></button>`).join('')}</div></div>`).join('');
-                document.querySelectorAll('.library-task-btn').forEach(btn => btn.addEventListener('click', e => {
-                    const { text, icon } = e.currentTarget.dataset;
-                    state.tasks[state.currentDay][currentPeriodForLibrary].push({ text, icon, done: false });
-                    libraryModal.style.display = 'none';
-                    saveAndRender();
-                }));
+                const catNames = { higiene: "Higiene", vestimenta: "Vestimenta", comidas: "Comidas", responsabilidades: "Responsabilidades", calmaYDescanso: "Calma y Descanso", juegoYAprendizaje: "Juego y Aprendizaje" };
+                $('#library-content').innerHTML = Object.keys(taskLibrary).map(cat => `<div class="mb-4"><h3 class="text-lg font-bold text-left text-blue-600 p-1">${catNames[cat]}</h3><div class="flex flex-wrap">${taskLibrary[cat].map(task => `<button class="library-task-btn modern-button bg-white p-2 m-1 flex items-center text-left" data-text="${task.t}" data-icon="${task.i}"><span class="text-2xl mr-2">${task.i}</span><span class="font-semibold">${task.t}</span></button>`).join('')}</div></div>`).join('');
             }
-
-            function renderRewards() {
-                const unlocked = rewards.filter(r => state.completedCount >= r.needed);
-                document.getElementById('rewards-grid').innerHTML = unlocked.length === 0 ? `<p class="col-span-full text-gray-500">¡Sigue completando tareas!</p>` : unlocked.map(r => `<div class="flex flex-col items-center p-2 bg-white rounded-lg shadow-inner"><span class="text-5xl">${r.emoji}</span><span class="text-xs font-bold text-center mt-1">${r.name}</span></div>`).join('');
+            function renderRewardStore() {
+                const grid = $('#rewards-store-grid');
+                grid.innerHTML = state.customRewards.length === 0 ? `<p class="col-span-full text-gray-500">Aún no hay recompensas. ¡Pídele a un adulto que añada algunas en Ajustes!</p>` 
+                    : state.customRewards.map((r, i) => {
+                        const canAfford = state.starBalance >= r.cost;
+                        return `<div class="reward-item modern-card p-4 flex flex-col items-center justify-between"><span class="text-5xl mb-2">${r.icon}</span><p class="font-bold text-center">${r.text}</p><div class="flex items-center font-bold text-amber-500 my-2">${r.cost} <span class="text-2xl ml-1">🌟</span></div><button data-index="${i}" class="redeem-reward-btn modern-button w-full py-1 ${canAfford ? 'modern-button-primary' : 'bg-gray-300 cursor-not-allowed'}" ${!canAfford ? 'disabled' : ''}>Canjear</button></div>`;
+                    }).join('');
+            }
+            function renderCustomRewardsList() {
+                 $('#custom-rewards-list').innerHTML = state.customRewards.length === 0 ? `<p class="text-gray-500 text-center">No hay recompensas personalizadas.</p>`
+                    : state.customRewards.map((r, i) => `<div class="flex items-center justify-between p-2 bg-white rounded-lg mb-2"><span>${r.icon} ${r.text} - <b>${r.cost}🌟</b></span><button data-index="${i}" class="delete-reward-btn text-red-500 font-bold text-2xl">&times;</button></div>`).join('');
             }
             
             // --- EVENT HANDLERS ---
             function addEventListeners() {
                 // Main Page
-                document.querySelectorAll('.day-selector').forEach(b => b.addEventListener('click', e => { state.currentDay = e.target.dataset.day; renderApp(); }));
-                document.querySelectorAll('.task-checkbox').forEach(cb => cb.addEventListener('change', e => handleTaskCheck(e.target.dataset.period, parseInt(e.target.dataset.index), e.target.checked)));
-                document.querySelectorAll('.add-task-btn').forEach(b => b.addEventListener('click', e => {
+                $$('.day-selector').forEach(b => b.addEventListener('click', e => { state.currentDay = e.target.dataset.day; renderApp(); }));
+                $$('.task-checkbox').forEach(cb => cb.addEventListener('change', e => handleTaskCheck(e.target.dataset.period, e.target.dataset.index, e.target.checked)));
+                $$('.add-task-btn').forEach(b => b.addEventListener('click', e => {
                     const period = e.target.dataset.period;
-                    const input = document.getElementById(`new-task-${period}`);
-                    if (input.value.trim()) { state.tasks[state.currentDay][period].push({ text: input.value.trim(), icon: '✏️', done: false }); input.value = ''; saveAndRender(); }
+                    const input = $(`#new-task-${period}`);
+                    if (input.value.trim()) { state.tasks[state.currentDay][period].push({ t: input.value.trim(), i: '✏️', done: false, stars: 1 }); input.value = ''; saveAndRender(); }
                 }));
-                document.querySelectorAll('[contenteditable="true"]').forEach(s => {
-                    s.addEventListener('blur', e => { state.tasks[state.currentDay][e.target.dataset.period][parseInt(e.target.dataset.index)].text = e.target.innerText; saveState(); });
+                $$('[contenteditable="true"]').forEach(s => {
+                    s.addEventListener('blur', e => { state.tasks[state.currentDay][e.target.dataset.period][e.target.dataset.index].t = e.target.innerText; saveState(); });
                     s.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
                 });
-                document.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', e => {
-                    const { period, index } = e.currentTarget.dataset;
-                    state.tasks[state.currentDay][period].splice(parseInt(index), 1);
-                    saveAndRender();
-                }));
-                document.querySelectorAll('.speak-btn').forEach(b => b.addEventListener('click', e => { const u = new SpeechSynthesisUtterance(e.currentTarget.dataset.text); u.lang = 'es-ES'; synth.speak(u); }));
+                $$('.delete-btn').forEach(b => b.addEventListener('click', e => { const { period, index } = e.currentTarget.dataset; state.tasks[state.currentDay][period].splice(index, 1); saveAndRender(); }));
+                $$('.speak-btn').forEach(b => b.addEventListener('click', e => { const u = new SpeechSynthesisUtterance(e.currentTarget.dataset.text); u.lang = 'es-ES'; synth.speak(u); }));
                 
-                // Header Buttons
-                document.getElementById('rewards-button').addEventListener('click', () => { renderRewards(); rewardsModal.style.display = 'flex'; });
-                document.getElementById('toggle-dark-mode').addEventListener('click', () => { state.darkMode = !state.darkMode; document.body.classList.toggle('dark-mode'); saveAndRender(); });
-                document.getElementById('print-button').addEventListener('click', () => window.print());
-                document.getElementById('logout-button').addEventListener('click', () => logoutConfirmModal.style.display = 'flex');
-                document.getElementById('copy-day-btn').addEventListener('click', handleOpenCopyModal);
+                // Header & Modals
+                $('#rewards-store-btn').addEventListener('click', () => { renderRewardStore(); modals.rewardsStore.style.display = 'flex'; });
+                $('#settings-btn').addEventListener('click', () => { renderCustomRewardsList(); modals.settings.style.display = 'flex'; });
+                $('#logout-btn').addEventListener('click', () => modals.logout.style.display = 'flex');
+                $('#copy-day-btn').addEventListener('click', handleOpenCopyModal);
+                $$('.close-modal-btn').forEach(btn => btn.addEventListener('click', (e) => e.target.closest('.fixed').style.display = 'none'));
+                $('#cancel-logout-btn').addEventListener('click', () => modals.logout.style.display = 'none');
+                $('#confirm-logout-btn').addEventListener('click', () => { localStorage.removeItem('miRutinaDivertida_v2'); location.reload(); });
+                $('#confirm-copy-btn').addEventListener('click', handleConfirmCopy);
+                $$('.open-library-btn').forEach(b => b.addEventListener('click', e => { modals.library.dataset.period = e.currentTarget.dataset.period; modals.library.style.display = 'flex'; }));
                 
-                // Modals
-                document.getElementById('close-rewards-button').addEventListener('click', () => rewardsModal.style.display = 'none');
-                document.getElementById('close-library-button').addEventListener('click', () => libraryModal.style.display = 'none');
-                document.getElementById('cancel-logout-btn').addEventListener('click', () => logoutConfirmModal.style.display = 'none');
-                document.getElementById('confirm-logout-btn').addEventListener('click', () => { localStorage.removeItem('miRutinaDivertida'); location.reload(); });
-                document.getElementById('close-copy-button').addEventListener('click', () => copyRoutineModal.style.display = 'none');
-                document.getElementById('confirm-copy-btn').addEventListener('click', handleConfirmCopy);
-                document.querySelectorAll('.open-library-btn').forEach(b => b.addEventListener('click', e => { currentPeriodForLibrary = e.currentTarget.dataset.period; libraryModal.style.display = 'flex'; }));
+                // Settings Modal
+                $('#add-reward-btn').addEventListener('click', () => {
+                    const text = $('#reward-text').value.trim(); const icon = $('#reward-icon').value.trim(); const cost = parseInt($('#reward-cost').value);
+                    if(text && icon && cost > 0) { state.customRewards.push({ text, icon, cost }); saveState(); renderCustomRewardsList(); $('#reward-text').value = $('#reward-icon').value = $('#reward-cost').value = ''; }
+                });
 
-                // Drag and Drop
+                // Dynamic Listeners
+                document.body.addEventListener('click', e => {
+                    if (e.target.matches('.delete-reward-btn')) { state.customRewards.splice(e.target.dataset.index, 1); saveState(); renderCustomRewardsList(); }
+                    if (e.target.matches('.redeem-reward-btn')) { const reward = state.customRewards[e.target.dataset.index]; if(state.starBalance >= reward.cost) { state.starBalance -= reward.cost; showNotification(`¡${reward.text} canjeado!`); saveState(); renderRewardStore(); } }
+                    if (e.target.matches('.library-task-btn')) { const { text, icon } = e.target.dataset; const period = modals.library.dataset.period; state.tasks[state.currentDay][period].push({ t: text, i: icon, done: false, stars: 1 }); modals.library.style.display = 'none'; saveAndRender(); }
+                });
+                
                 addDragDropListeners();
-            }
-
-            function addDragDropListeners() {
-                 document.querySelectorAll('.task-item').forEach(item => {
-                    item.addEventListener('dragstart', handleDragStart);
-                    item.addEventListener('dragend', handleDragEnd);
-                 });
-                 document.querySelectorAll('.task-list').forEach(list => {
-                    list.addEventListener('dragover', handleDragOver);
-                    list.addEventListener('drop', handleDrop);
-                 });
             }
 
             function handleTaskCheck(period, index, isDone) {
                 const task = state.tasks[state.currentDay][period][index];
                 if (task.done === isDone) return;
                 task.done = isDone;
-                if (isDone) {
-                    state.completedCount++;
-                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                    sound.triggerAttackRelease('C4', '8n');
-                    const newReward = rewards.find(r => r.needed === state.completedCount);
-                    if (newReward) showNotification(`¡Nueva recompensa! ${newReward.emoji} ${newReward.name}`);
-                } else {
-                    state.completedCount = Math.max(0, state.completedCount - 1);
-                }
+                const starValue = task.stars || 1;
+                state.starBalance += isDone ? starValue : -starValue;
+                if (isDone) { confetti({ particleCount: 50, spread: 40, origin: { y: 0.6 } }); sound.triggerAttackRelease('C5', '8n'); }
                 saveAndRender();
             }
             
             function handleOpenCopyModal() {
-                document.getElementById('copy-day-name').textContent = state.currentDay;
-                const selectionDiv = document.getElementById('copy-days-selection');
-                selectionDiv.innerHTML = daysOfWeek.filter(d => d !== state.currentDay).map(day => `
-                    <label class="flex items-center space-x-2 p-2 rounded-lg hover:bg-amber-100 cursor-pointer">
-                        <input type="checkbox" class="form-checkbox h-5 w-5 text-amber-500 rounded" value="${day}">
-                        <span class="font-semibold">${day}</span>
-                    </label>`).join('');
-                copyRoutineModal.style.display = 'flex';
+                $('#copy-day-name').textContent = state.currentDay;
+                $('#copy-days-selection').innerHTML = daysOfWeek.filter(d => d !== state.currentDay).map(day => `<label class="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-100 cursor-pointer"><input type="checkbox" class="form-checkbox h-5 w-5 text-blue-500 rounded" value="${day}"><span class="font-semibold">${day}</span></label>`).join('');
+                modals.copy.style.display = 'flex';
             }
-
             function handleConfirmCopy() {
                 const routineToCopy = JSON.parse(JSON.stringify(state.tasks[state.currentDay]));
-                document.querySelectorAll('#copy-days-selection input:checked').forEach(checkbox => {
-                    state.tasks[checkbox.value] = JSON.parse(JSON.stringify(routineToCopy));
-                });
-                copyRoutineModal.style.display = 'none';
+                $$('#copy-days-selection input:checked').forEach(cb => { state.tasks[cb.value] = JSON.parse(JSON.stringify(routineToCopy)); });
+                modals.copy.style.display = 'none';
                 saveAndRender();
                 showNotification(`Rutina copiada!`);
             }
-
-            // Drag Handlers
-            function handleDragStart(e) {
-                draggedTask = e.target;
-                e.dataTransfer.effectAllowed = 'move';
-                setTimeout(() => e.target.classList.add('dragging'), 0);
-            }
-            function handleDragEnd(e) {
-                draggedTask.classList.remove('dragging');
-                draggedTask = null;
-            }
-            function handleDragOver(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-            }
-            function handleDrop(e) {
-                e.preventDefault();
-                const targetList = e.currentTarget;
-                if (draggedTask && targetList.contains(e.target)) {
-                    const fromPeriod = draggedTask.dataset.period;
-                    const fromIndex = parseInt(draggedTask.dataset.index);
-                    const toPeriod = targetList.dataset.period;
-                    
-                    const targetElement = e.target.closest('.task-item');
-                    const toIndex = targetElement ? parseInt(targetElement.dataset.index) : state.tasks[state.currentDay][toPeriod].length;
-
-                    const taskToMove = state.tasks[state.currentDay][fromPeriod].splice(fromIndex, 1)[0];
-                    state.tasks[state.currentDay][toPeriod].splice(toIndex, 0, taskToMove);
-                    
-                    saveAndRender();
-                }
+            
+            // --- Drag & Drop ---
+            function addDragDropListeners() {
+                 $$('.task-item').forEach(i => { i.addEventListener('dragstart', e => { draggedTask = e.target; setTimeout(() => e.target.classList.add('dragging'), 0); }); i.addEventListener('dragend', () => draggedTask.classList.remove('dragging')); });
+                 $$('.task-list').forEach(l => { l.addEventListener('dragover', e => e.preventDefault()); l.addEventListener('drop', e => { e.preventDefault(); const toPeriod = e.currentTarget.dataset.period; const targetEl = e.target.closest('.task-item'); const toIndex = targetEl ? parseInt(targetEl.dataset.index) : state.tasks[state.currentDay][toPeriod].length; const taskToMove = state.tasks[state.currentDay][draggedTask.dataset.period].splice(draggedTask.dataset.index, 1)[0]; state.tasks[state.currentDay][toPeriod].splice(toIndex, 0, taskToMove); saveAndRender(); }); });
             }
             
             function showNotification(message) {
-                const notificationModal = document.getElementById('notification-modal');
-                const notificationText = document.getElementById('notification-text');
-                if (!notificationModal || !notificationText) return;
-                notificationText.innerHTML = message;
-                notificationModal.style.transform = 'translateX(0)';
-                setTimeout(() => { notificationModal.style.transform = 'translateX(calc(100% + 1.25rem))'; }, 3000);
+                const el = $('#notification-modal');
+                $('#notification-text').innerHTML = message;
+                el.style.transform = 'translateX(0)';
+                setTimeout(() => { el.style.transform = 'translateX(calc(100% + 1.25rem))'; }, 3000);
             }
+            function saveAndRender() { saveState(); renderApp(); }
+            function isDayComplete(day) { const tasks = state.tasks[day]; if(!tasks) return false; return [...tasks.AM, ...tasks.PM, ...tasks.Noche].every(t => t.done); }
 
-            function saveAndRender() {
-                saveState();
-                renderApp();
-            }
-            
             initialize();
         });
     </script>
