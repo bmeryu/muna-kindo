@@ -182,28 +182,44 @@
                     if (state.starBalance === undefined) { state.starBalance = 0; }
 
                     // --- MIGRATION LOGIC ---
-                    // This part checks if the saved tasks use the old format (t, i) and converts them to the new format (text, img)
                     if (state.tasks && Object.keys(state.tasks).length > 0) {
-                        const allLibraryTasksByText = {};
-                        Object.values(taskLibrary).flat().forEach(libTask => {
-                            allLibraryTasksByText[libTask.text] = libTask.img;
-                        });
+                        const migrationMap = {
+                            'Ir al baño y tirar la cadena': { text: 'Ir al baño', img: 'https://static.arasaac.org/pictograms/2959/2959_300.png' },
+                            'Lavarse las manos con jabón': { text: 'Lavarse las manos', img: 'https://static.arasaac.org/pictograms/3236/3236_300.png' },
+                            'Peinarse el pelo': { text: 'Peinarse', img: 'https://static.arasaac.org/pictograms/3241/3241_300.png' },
+                            'Darse un baño o ducha': { text: 'Ducharse o bañarse', img: 'https://static.arasaac.org/pictograms/2439/2439_300.png' },
+                            'Ponerse la ropa de día': { text: 'Vestirse', img: 'https://static.arasaac.org/pictograms/3245/3245_300.png' },
+                            'Elegir la ropa para mañana': { text: 'Elegir la ropa', img: 'https://static.arasaac.org/pictograms/30739/30739_300.png' },
+                            'Poner la ropa sucia en el cesto': { text: 'Ropa sucia al cesto', img: 'https://static.arasaac.org/pictograms/4572/4572_300.png' },
+                            'Comer el almuerzo': { text: 'Comer', img: 'https://static.arasaac.org/pictograms/2364/2364_300.png' },
+                            'Cenar en familia': { text: 'Cenar', img: 'https://static.arasaac.org/pictograms/2320/2320_300.png' },
+                            'Ayudar a poner la mesa': { text: 'Poner la mesa', img: 'https://static.arasaac.org/pictograms/3333/3333_300.png' },
+                            'Darle comida a la mascota': { text: 'Comida de la mascota', img: 'https://static.arasaac.org/pictograms/3267/3267_300.png' },
+                            'Momento de tranquilidad': { text: 'Momento de calma', img: 'https://static.arasaac.org/pictograms/7041/7041_300.png' },
+                            'Escuchar música relajante': { text: 'Escuchar música', img: 'https://static.arasaac.org/pictograms/2549/2549_300.png' },
+                            'Abrazos y mimos': { text: 'Abrazar', img: 'https://static.arasaac.org/pictograms/2244/2244_300.png' },
+                            'Ir a la cama a descansar': { text: 'Ir a dormir', img: 'https://static.arasaac.org/pictograms/2434/2434_300.png' },
+                            'Despertar y estirarse': { text: 'Despertar', img: 'https://static.arasaac.org/pictograms/2420/2420_300.png' },
+                            'Jugar libremente': { text: 'Jugar', img: 'https://static.arasaac.org/pictograms/2898/2898_300.png' },
+                            'Hacer una manualidad': { text: 'Hacer manualidades', img: 'https://static.arasaac.org/pictograms/2795/2795_300.png' },
+                            'Jugar al aire libre': { text: 'Jugar afuera', img: 'https://static.arasaac.org/pictograms/3201/3201_300.png' },
+                            'Hacer las tareas de la escuela': { text: 'Hacer los deberes', img: 'https://static.arasaac.org/pictograms/2425/2425_300.png' }
+                        };
                         
                         Object.values(state.tasks).forEach(day => {
                             Object.values(day).forEach(periodTasks => {
                                 periodTasks.forEach(task => {
-                                    // If task has 't' property but not 'text', it's the old emoji format
                                     if (task.t && task.text === undefined) {
-                                        task.text = task.t;
-                                        delete task.t;
-                                        
-                                        // Find the corresponding image from the new library
-                                        if (allLibraryTasksByText[task.text]) {
-                                            task.img = allLibraryTasksByText[task.text];
+                                        const oldText = task.t;
+                                        const migratedTaskData = migrationMap[oldText];
+                                        if (migratedTaskData) {
+                                            task.text = migratedTaskData.text;
+                                            task.img = migratedTaskData.img;
                                         } else {
-                                            // Default pictogram for custom tasks from old versions
-                                            task.img = 'https://static.arasaac.org/pictograms/2750/2750_300.png';
+                                            task.text = oldText;
+                                            task.img = 'https://static.arasaac.org/pictograms/2750/2750_300.png'; 
                                         }
+                                        delete task.t;
                                         delete task.i;
                                     }
                                 });
