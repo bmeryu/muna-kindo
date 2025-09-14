@@ -89,7 +89,7 @@
         .dark-mode .icon-container {
             background-color: #374151;
             box-shadow: inset 2px 2px 4px #111827, inset -2px -2px 4px #4b5563;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); /* Sombra ajustada para modo oscuro */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
         }
     </style>
 </head>
@@ -197,7 +197,6 @@
                     if (state.customRewards === undefined) state.customRewards = [];
                     if (state.starBalance === undefined) state.starBalance = 0;
 
-                    // --- MIGRATION LOGIC ---
                     if (state.tasks && Object.keys(state.tasks).length > 0) {
                         let wasMigrated = false;
                         const emojiMap = new Map();
@@ -211,9 +210,7 @@
                                         const originalText = task.text || task.t;
                                         task.text = originalText;
                                         task.icon = emojiMap.get(originalText) || '✏️';
-                                        delete task.img;
-                                        delete task.t;
-                                        delete task.i;
+                                        delete task.img; delete task.t; delete task.i;
                                     }
                                 });
                             });
@@ -238,7 +235,6 @@
                     modals.setup.style.display = 'none';
                     saveAndRender();
                 });
-                // Attach the delegated body listener only ONCE
                 document.body.addEventListener('click', handleBodyClick);
             }
             function initializeTasksForWeek() {
@@ -257,9 +253,9 @@
                             <div class="flex items-center gap-2">${Object.keys(avatars).map(key => `<div class="${state.avatar === key ? '' : 'hidden'} text-5xl">${avatars[key].emoji}</div>`).join('')} <div><p class="text-gray-500">Rutina de</p><h1 class="text-2xl font-bold text-gray-800">${state.childName}</h1></div> </div>
                             <div class="flex items-center justify-center bg-amber-100 rounded-full px-4 py-1 shadow-inner"><span class="text-2xl font-bold text-amber-600">${state.starBalance}</span><span class="text-3xl ml-1">🌟</span></div>
                             <div class="flex items-center space-x-2">
-                                <button id="rewards-store-btn" class="modern-button bg-white p-3" title="Tienda de Recompensas">🎁</button>
-                                <button id="settings-btn" class="modern-button bg-white p-3" title="Ajustes">⚙️</button>
-                                <button id="logout-btn" class="modern-button bg-white p-3" title="Cerrar Sesión">🚪</button>
+                                <button data-modal="rewardsStore" class="modern-button bg-white p-3" title="Tienda de Recompensas">🎁</button>
+                                <button data-modal="settings" class="modern-button bg-white p-3" title="Ajustes">⚙️</button>
+                                <button data-modal="logout" class="modern-button bg-white p-3" title="Cerrar Sesión">🚪</button>
                             </div>
                         </div>
                         <div class="mb-4"><p class="text-gray-500 mb-2 font-semibold">Progreso Semanal:</p><div class="flex justify-center space-x-2">${daysOfWeek.map(day => `<div class="flex flex-col items-center"><span class="text-xs font-bold">${day.substring(0,3)}</span><span class="text-2xl">${isDayComplete(day) ? '🌟' : '⚪'}</span></div>`).join('')}</div></div>
@@ -295,7 +291,11 @@
                                 <div class="task-item flex items-center p-2 w-full">
                                     <div class="icon-container">${task.icon}</div>
                                     <span class="grow text-gray-700 font-semibold" contenteditable="true" data-period="${period}" data-index="${index}">${task.text}</span>
-                                    <div class="flex-none w-8 h-8 mr-2 flex items-center justify-center">
+                                    <div class="flex items-center text-amber-500 font-bold mr-2">
+                                        <span class="task-stars w-6 text-center" contenteditable="true" data-period="${period}" data-index="${index}">${task.stars || 1}</span>
+                                        <span>🌟</span>
+                                    </div>
+                                    <div class="flex-none w-8 h-8 flex items-center justify-center">
                                         <svg class="icon-unchecked w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         <svg class="icon-checked hidden w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                     </div>
@@ -324,32 +324,51 @@
             }
             
             function handleBodyClick(e) {
-                if (e.target.matches('.delete-reward-btn')) { state.customRewards.splice(e.target.dataset.index, 1); saveState(); renderCustomRewardsList(); }
-                if (e.target.matches('.redeem-reward-btn')) { const reward = state.customRewards[e.target.dataset.index]; if(state.starBalance >= reward.cost) { state.starBalance -= reward.cost; showNotification(`¡${reward.text} canjeado!`); saveState(); renderRewardStore(); renderApp(); } }
-                const libraryBtn = e.target.closest('.library-task-btn');
+                const target = e.target;
+                if (target.matches('.delete-reward-btn')) { state.customRewards.splice(target.dataset.index, 1); saveState(); renderCustomRewardsList(); }
+                if (target.matches('.redeem-reward-btn')) { const reward = state.customRewards[target.dataset.index]; if(state.starBalance >= reward.cost) { state.starBalance -= reward.cost; showNotification(`¡${reward.text} canjeado!`); saveState(); renderRewardStore(); renderApp(); } }
+                const libraryBtn = target.closest('.library-task-btn');
                 if (libraryBtn) { const { text, icon } = libraryBtn.dataset; const period = modals.library.dataset.period; state.tasks[state.currentDay][period].push({ text, icon, done: false, stars: 1 }); modals.library.style.display = 'none'; saveAndRender(); }
+                if (target.matches('.day-selector')) { state.currentDay = target.dataset.day; renderApp(); }
+                const speakBtn = target.closest('.speak-btn');
+                if (speakBtn) { const u = new SpeechSynthesisUtterance(speakBtn.dataset.text); u.lang = 'es-ES'; synth.speak(u); }
+                const deleteBtn = target.closest('.delete-btn');
+                if(deleteBtn) { const { period, index } = deleteBtn.dataset; state.tasks[state.currentDay][period].splice(index, 1); saveAndRender(); }
+                const addTaskBtn = target.closest('.add-task-btn');
+                if(addTaskBtn) { const period = addTaskBtn.dataset.period; const input = $(`#new-task-${period}`); if (input.value.trim()) { state.tasks[state.currentDay][period].push({ text: input.value.trim(), icon: '✏️', done: false, stars: 1 }); input.value = ''; saveAndRender(); } }
+                if(target.closest('[data-modal]')) { const modalId = target.closest('[data-modal]').dataset.modal; modals[modalId].style.display = 'flex'; if (modalId === 'settings') renderCustomRewardsList(); if (modalId === 'rewardsStore') renderRewardStore(); }
+                if(target.closest('.close-modal-btn')) { target.closest('.fixed').style.display = 'none'; }
+                const openLibraryBtn = target.closest('.open-library-btn');
+                if (openLibraryBtn) { modals.library.dataset.period = openLibraryBtn.dataset.period; modals.library.style.display = 'flex'; }
+                if (target.matches('#copy-day-btn')) { $('#copy-day-name').textContent = state.currentDay; $('#copy-days-selection').innerHTML = daysOfWeek.filter(d => d !== state.currentDay).map(day => `<label class="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-100 cursor-pointer"><input type="checkbox" class="form-checkbox h-5 w-5 text-blue-500 rounded" value="${day}"><span class="font-semibold">${day}</span></label>`).join(''); modals.copy.style.display = 'flex'; }
+                if(target.matches('#cancel-logout-btn')) { modals.logout.style.display = 'none'; }
+                if(target.matches('#confirm-logout-btn')) { localStorage.removeItem('miRutinaDivertida_v2'); location.reload(); }
+                if(target.matches('#confirm-copy-btn')) { $$('#copy-days-selection input:checked').forEach(cb => { state.tasks[cb.value] = JSON.parse(JSON.stringify(state.tasks[state.currentDay])); }); modals.copy.style.display = 'none'; saveAndRender(); showNotification(`Rutina copiada!`); }
+                if (target.matches('#add-reward-btn')) {
+                    const textInput = $('#reward-text'), iconInput = $('#reward-icon'), costInput = $('#reward-cost');
+                    const text = textInput.value.trim(), icon = iconInput.value.trim(), cost = parseInt(costInput.value);
+                    textInput.style.borderColor = text ? '' : '#EF4444'; iconInput.style.borderColor = icon ? '' : '#EF4444'; costInput.style.borderColor = cost > 0 ? '' : '#EF4444';
+                    if (text && icon && cost > 0) { state.customRewards.push({ text, icon, cost }); saveState(); renderCustomRewardsList(); textInput.value = iconInput.value = costInput.value = ''; textInput.style.borderColor = iconInput.style.borderColor = costInput.style.borderColor = ''; }
+                }
             }
 
             function addEventListeners() {
-                $$('.day-selector').forEach(b => b.addEventListener('click', e => { state.currentDay = e.target.dataset.day; renderApp(); }));
                 $$('.task-checkbox').forEach(cb => cb.addEventListener('change', e => handleTaskCheck(e.target.dataset.period, e.target.dataset.index, e.target.checked)));
-                $$('.add-task-btn').forEach(b => b.addEventListener('click', e => { const period = e.target.dataset.period; const input = $(`#new-task-${period}`); if (input.value.trim()) { state.tasks[state.currentDay][period].push({ text: input.value.trim(), icon: '✏️', done: false, stars: 1 }); input.value = ''; saveAndRender(); } }));
-                $$('[contenteditable="true"]').forEach(s => { s.addEventListener('blur', e => { state.tasks[state.currentDay][e.target.dataset.period][e.target.dataset.index].text = e.target.innerText; saveState(); }); s.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } }); });
-                $$('.delete-btn').forEach(b => b.addEventListener('click', e => { const { period, index } = e.currentTarget.dataset; state.tasks[state.currentDay][period].splice(index, 1); saveAndRender(); }));
-                $$('.speak-btn').forEach(b => b.addEventListener('click', e => { const u = new SpeechSynthesisUtterance(e.currentTarget.dataset.text); u.lang = 'es-ES'; synth.speak(u); }));
-                
-                $('#rewards-store-btn').addEventListener('click', () => { renderRewardStore(); modals.rewardsStore.style.display = 'flex'; });
-                $('#settings-btn').addEventListener('click', () => { renderCustomRewardsList(); modals.settings.style.display = 'flex'; });
-                $('#logout-btn').addEventListener('click', () => modals.logout.style.display = 'flex');
-                $('#copy-day-btn').addEventListener('click', () => { $('#copy-day-name').textContent = state.currentDay; $('#copy-days-selection').innerHTML = daysOfWeek.filter(d => d !== state.currentDay).map(day => `<label class="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-100 cursor-pointer"><input type="checkbox" class="form-checkbox h-5 w-5 text-blue-500 rounded" value="${day}"><span class="font-semibold">${day}</span></label>`).join(''); modals.copy.style.display = 'flex'; });
-                $$('.close-modal-btn').forEach(btn => btn.addEventListener('click', (e) => e.target.closest('.fixed').style.display = 'none'));
-                $('#cancel-logout-btn').addEventListener('click', () => modals.logout.style.display = 'none');
-                $('#confirm-logout-btn').addEventListener('click', () => { localStorage.removeItem('miRutinaDivertida_v2'); location.reload(); });
-                $('#confirm-copy-btn').addEventListener('click', () => { $$('#copy-days-selection input:checked').forEach(cb => { state.tasks[cb.value] = JSON.parse(JSON.stringify(state.tasks[state.currentDay])); }); modals.copy.style.display = 'none'; saveAndRender(); showNotification(`Rutina copiada!`); });
-                $$('.open-library-btn').forEach(b => b.addEventListener('click', e => { modals.library.dataset.period = e.currentTarget.dataset.period; modals.library.style.display = 'flex'; }));
-                
-                $('#add-reward-btn').addEventListener('click', () => { const text = $('#reward-text').value.trim(); const icon = $('#reward-icon').value.trim(); const cost = parseInt($('#reward-cost').value); if(text && icon && cost > 0) { state.customRewards.push({ text, icon, cost }); saveState(); renderCustomRewardsList(); $('#reward-text').value = $('#reward-icon').value = $('#reward-cost').value = ''; } });
-
+                $$('[contenteditable="true"]').forEach(s => {
+                    s.addEventListener('blur', e => {
+                        const {period, index} = e.target.dataset;
+                        if(e.target.classList.contains('task-stars')) {
+                            let newStars = parseInt(e.target.innerText) || 1;
+                            if (newStars < 1) newStars = 1;
+                            state.tasks[state.currentDay][period][index].stars = newStars;
+                            e.target.innerText = newStars;
+                        } else {
+                            state.tasks[state.currentDay][period][index].text = e.target.innerText;
+                        }
+                        saveState();
+                    });
+                    s.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
+                });
                 addDragDropListeners();
             }
 
