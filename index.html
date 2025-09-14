@@ -238,6 +238,8 @@
                     modals.setup.style.display = 'none';
                     saveAndRender();
                 });
+                // Attach the delegated body listener only ONCE
+                document.body.addEventListener('click', handleBodyClick);
             }
             function initializeTasksForWeek() {
                 const selectedRoutine = routines[$('#routine-select').value];
@@ -277,7 +279,13 @@
                     <div class="modern-card p-4 flex flex-col">
                         <h2 class="text-xl font-extrabold text-center mb-4 ${colors[period]} rounded-lg py-2">${title}</h2>
                         <ul class="space-y-3 task-list flex-grow" data-period="${period}">${tasks.map((task, index) => renderTaskItem(task, period, index)).join('')}</ul>
-                        <div class="mt-4"><div class="flex space-x-2"><input type="text" id="new-task-${period}" class="w-full p-2 border-2 border-gray-200 rounded-lg" placeholder="Nueva tarea..."><button class="add-task-btn modern-button modern-button-primary px-4" data-period="${period}">+</button></div><button class="open-library-btn modern-button modern-button-secondary w-full mt-2 py-2" data-period="${period}">Añadir de Biblioteca</button></div>
+                        <div class="mt-4">
+                            <button class="open-library-btn modern-button modern-button-primary w-full mb-2 py-2" data-period="${period}">Añadir de Biblioteca</button>
+                            <div class="flex space-x-2">
+                                <input type="text" id="new-task-${period}" class="w-full p-2 border-2 border-gray-200 rounded-lg" placeholder="Tarea personalizada...">
+                                <button class="add-task-btn modern-button modern-button-secondary px-4" data-period="${period}">Añadir</button>
+                            </div>
+                        </div>
                     </div>`;
             }
             function renderTaskItem(task, period, index) { 
@@ -315,6 +323,13 @@
                     : state.customRewards.map((r, i) => `<div class="flex items-center justify-between p-2 bg-white rounded-lg mb-2"><span>${r.icon} ${r.text} - <b>${r.cost}🌟</b></span><button data-index="${i}" class="delete-reward-btn text-red-500 font-bold text-2xl">&times;</button></div>`).join('');
             }
             
+            function handleBodyClick(e) {
+                if (e.target.matches('.delete-reward-btn')) { state.customRewards.splice(e.target.dataset.index, 1); saveState(); renderCustomRewardsList(); }
+                if (e.target.matches('.redeem-reward-btn')) { const reward = state.customRewards[e.target.dataset.index]; if(state.starBalance >= reward.cost) { state.starBalance -= reward.cost; showNotification(`¡${reward.text} canjeado!`); saveState(); renderRewardStore(); renderApp(); } }
+                const libraryBtn = e.target.closest('.library-task-btn');
+                if (libraryBtn) { const { text, icon } = libraryBtn.dataset; const period = modals.library.dataset.period; state.tasks[state.currentDay][period].push({ text, icon, done: false, stars: 1 }); modals.library.style.display = 'none'; saveAndRender(); }
+            }
+
             function addEventListeners() {
                 $$('.day-selector').forEach(b => b.addEventListener('click', e => { state.currentDay = e.target.dataset.day; renderApp(); }));
                 $$('.task-checkbox').forEach(cb => cb.addEventListener('change', e => handleTaskCheck(e.target.dataset.period, e.target.dataset.index, e.target.checked)));
@@ -335,13 +350,6 @@
                 
                 $('#add-reward-btn').addEventListener('click', () => { const text = $('#reward-text').value.trim(); const icon = $('#reward-icon').value.trim(); const cost = parseInt($('#reward-cost').value); if(text && icon && cost > 0) { state.customRewards.push({ text, icon, cost }); saveState(); renderCustomRewardsList(); $('#reward-text').value = $('#reward-icon').value = $('#reward-cost').value = ''; } });
 
-                document.body.addEventListener('click', e => {
-                    if (e.target.matches('.delete-reward-btn')) { state.customRewards.splice(e.target.dataset.index, 1); saveState(); renderCustomRewardsList(); }
-                    if (e.target.matches('.redeem-reward-btn')) { const reward = state.customRewards[e.target.dataset.index]; if(state.starBalance >= reward.cost) { state.starBalance -= reward.cost; showNotification(`¡${reward.text} canjeado!`); saveState(); renderRewardStore(); renderApp(); } }
-                    const libraryBtn = e.target.closest('.library-task-btn');
-                    if (libraryBtn) { const { text, icon } = libraryBtn.dataset; const period = modals.library.dataset.period; state.tasks[state.currentDay][period].push({ text, icon, done: false, stars: 1 }); modals.library.style.display = 'none'; saveAndRender(); }
-                });
-                
                 addDragDropListeners();
             }
 
