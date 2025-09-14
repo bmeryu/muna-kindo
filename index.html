@@ -59,13 +59,33 @@
         .dark-mode .day-selector.bg-white { background-color: #374151; }
         .dark-mode .bg-gray-100, .dark-mode .bg-gray-50 { background-color: #374151; }
         .dark-mode #settings-modal input, .dark-mode #setup-modal input, .dark-mode #setup-modal select, .dark-mode #new-task-AM, .dark-mode #new-task-PM, .dark-mode #new-task-Noche { background-color: #4B5563; border-color: #6B7280; color: #F9FAFB; }
-        .dark-mode .task-item { background-color: #4B5563;}
-
         
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .task-item, .reward-item { animation: fadeIn 0.3s ease-out; }
-        .dragging { opacity: 0.5; background-color: #FEF3C7; }
+        .reward-item { animation: fadeIn 0.3s ease-out; }
+        .dragging { opacity: 0.9; box-shadow: inset 3px 3px 6px rgba(0,0,0,0.2), inset -3px -3px 6px rgba(255,255,255,0.2); }
         .drag-over { border-top: 2px dashed #3B82F6; }
+
+        /* Estilo 3D para tarjetas de tarea */
+        .task-item {
+            animation: fadeIn 0.3s ease-out;
+            background-color: #F8F9FA;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.08), -4px -4px 8px rgba(255, 255, 255, 0.9);
+            transition: all 0.2s ease-in-out;
+        }
+        .task-item:hover {
+            transform: scale(1.02);
+            box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.1), -6px -6px 12px rgba(255, 255, 255, 1);
+        }
+        .dark-mode .task-item {
+            background-color: #1F2937;
+            border-color: #374151;
+            box-shadow: 4px 4px 8px #111827, -4px -4px 8px #2d3a4b;
+        }
+        .dark-mode .task-item:hover {
+            box-shadow: 6px 6px 12px #111827, -6px -6px 12px #2d3a4b;
+        }
     </style>
 </head>
 <body class="transition-colors duration-500">
@@ -291,7 +311,7 @@
                     </div>`;
             }
             function renderTaskItem(task, period, index) { 
-                return `<li class="task-item flex items-center bg-gray-50 p-2 rounded-lg shadow-sm cursor-move ${task.done ? 'opacity-50' : ''}" draggable="true" data-period="${period}" data-index="${index}">
+                return `<li class="task-item flex items-center p-2 ${task.done ? 'opacity-50' : ''}" draggable="true" data-period="${period}" data-index="${index}">
                             <input type="checkbox" id="task-${period}-${index}" class="hidden task-checkbox" ${task.done ? 'checked' : ''} data-period="${period}" data-index="${index}">
                             <label for="task-${period}-${index}" class="flex items-center grow cursor-pointer">
                                 <img src="${task.img}" alt="${task.text}" class="w-10 h-10 mr-3 object-contain flex-shrink-0">
