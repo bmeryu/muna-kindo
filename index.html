@@ -173,6 +173,18 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmación para Cerrar Sesión -->
+    <div id="logout-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50 no-print">
+        <div class="clay-card p-6 md:p-8 w-full max-w-sm text-center">
+            <h2 class="text-xl md:text-2xl font-bold text-amber-600 mb-4">¿Cerrar Sesión?</h2>
+            <p class="text-gray-500 mb-6">Se borrarán todos los datos guardados (nombre, avatar y progreso). ¿Estás seguro?</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-logout-btn" class="clay-button bg-red-500 text-white font-bold py-2 px-6 rounded-lg">Sí, cerrar</button>
+                <button id="cancel-logout-btn" class="clay-button bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg">No, cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notificación Toast para Recompensas -->
     <div id="notification-modal" class="fixed top-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg transform translate-x-[calc(100%+1.25rem)] transition-transform duration-500 z-50 no-print">
         <p id="notification-text" class="font-bold"></p>
@@ -185,6 +197,7 @@
             const setupModal = document.getElementById('setup-modal');
             const rewardsModal = document.getElementById('rewards-modal');
             const libraryModal = document.getElementById('library-modal');
+            const logoutConfirmModal = document.getElementById('logout-confirm-modal');
             const startButton = document.getElementById('start-button');
             const childNameInput = document.getElementById('child-name');
             const avatarSelection = document.getElementById('avatar-selection');
@@ -351,14 +364,15 @@
                 app.innerHTML = `
                     <header class="clay-card p-4 mb-6 text-center no-print">
                          <div class="flex justify-between items-center mb-4">
-                            <button id="rewards-button" class="text-3xl hover:transform hover:scale-110 transition-transform">🏅</button>
+                            <button id="rewards-button" class="text-3xl hover:transform hover:scale-110 transition-transform" title="Mis Recompensas">🏅</button>
                             <div class="text-center">
                                 <div class="text-5xl">${avatars[state.avatar].emoji}</div>
                                 <h1 class="text-2xl font-bold text-gray-800">Hola, ${state.childName}!</h1>
                             </div>
                             <div class="flex flex-col items-center space-y-2">
-                                <button id="toggle-dark-mode" class="text-2xl hover:transform hover:scale-110 transition-transform">${state.darkMode ? '☀️' : '🌙'}</button>
-                                <button id="print-button" class="text-2xl hover:transform hover:scale-110 transition-transform">🖨️</button>
+                                <button id="toggle-dark-mode" class="text-2xl hover:transform hover:scale-110 transition-transform" title="Modo Noche">${state.darkMode ? '☀️' : '🌙'}</button>
+                                <button id="print-button" class="text-2xl hover:transform hover:scale-110 transition-transform" title="Imprimir">🖨️</button>
+                                <button id="logout-button" class="text-2xl hover:transform hover:scale-110 transition-transform" title="Cerrar Sesión">🚪</button>
                             </div>
                         </div>
                         <p class="text-gray-500 mb-2">Tu progreso de hoy:</p>
@@ -501,6 +515,18 @@
                     });
                 });
                 document.getElementById('close-library-button').addEventListener('click', () => libraryModal.style.display = 'none');
+
+                // Cerrar Sesión
+                document.getElementById('logout-button').addEventListener('click', () => {
+                    logoutConfirmModal.style.display = 'flex';
+                });
+                document.getElementById('cancel-logout-btn').addEventListener('click', () => {
+                    logoutConfirmModal.style.display = 'none';
+                });
+                document.getElementById('confirm-logout-btn').addEventListener('click', () => {
+                    localStorage.removeItem('miRutinaDivertida');
+                    location.reload();
+                });
             }
 
             function handleTaskCheck(period, index, isDone) {
