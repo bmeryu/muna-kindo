@@ -169,12 +169,14 @@
 
             function generateTaskLibrary() {
                 const lib = {
-                    higiene: [ { text: 'Ir al baño', icon: '🚽' }, { text: 'Lavarse las manos', icon: '🧼' }, { text: 'Lavarse los dientes', icon: '🦷' }, { text: 'Peinarse', icon: '🪮' }, { text: 'Ducharse o bañarse', icon: '🛁' } ],
-                    vestimenta: [ { text: 'Vestirse', icon: '👕' }, { text: 'Ponerse el pijama', icon: '🥹' }, { text: 'Elegir la ropa', icon: '🤔' }, { text: 'Ponerse los zapatos', icon: '👟' }, { text: 'Ropa sucia al cesto', icon: '🧺' } ],
-                    comidas: [ { text: 'Desayunar', icon: '🥣' }, { text: 'Comer', icon: '🥪' }, { text: 'Tomar la merienda', icon: '🍎' }, { text: 'Cenar', icon: '🍽️' }, { text: 'Poner la mesa', icon: '🍴' }, { text: 'Beber agua', icon: '💧' } ],
-                    responsabilidades: [ { text: 'Ordenar los juguetes', icon: '📦' }, { text: 'Hacer la cama', icon: '🛏️' }, { text: 'Comida de la mascota', icon: '🐾' }, { text: 'Regar las plantas', icon: '🌱' } ],
-                    calmaYDescanso: [ { text: 'Leer un cuento', icon: '📖' }, { text: 'Momento de calma', icon: '🧘' }, { text: 'Escuchar música', icon: '🎶' }, { text: 'Abrazar', icon: '🤗' }, { text: 'Ir a dormir', icon: '😴' }, { text: 'Despertar', icon: '☀️' } ],
-                    juegoYAprendizaje: [ { text: 'Jugar', icon: '🧸' }, { text: 'Hacer manualidades', icon: '🎨' }, { text: 'Jugar afuera', icon: '🌳' }, { text: 'Hacer los deberes', icon: '📚' } ]
+                    higiene: [ { text: 'Ir al baño', icon: '🚽' }, { text: 'Lavarse las manos', icon: '🧼' }, { text: 'Lavarse los dientes', icon: '🦷' }, { text: 'Peinarse', icon: '🪮' }, { text: 'Ducharse o bañarse', icon: '🛁' }, { text: 'Sonarse la nariz', icon: '🤧' }, { text: 'Cortarse las uñas', icon: '💅' } ],
+                    vestimenta: [ { text: 'Vestirse', icon: '👕' }, { text: 'Ponerse el pijama', icon: '🥹' }, { text: 'Elegir la ropa', icon: '🤔' }, { text: 'Ponerse los zapatos', icon: '👟' }, { text: 'Ropa sucia al cesto', icon: '🧺' }, { text: 'Ponerse el abrigo', icon: '🧥' }, { text: 'Guardar la ropa limpia', icon: '👚' } ],
+                    comidas: [ { text: 'Desayunar', icon: '🥣' }, { text: 'Comer', icon: '🥪' }, { text: 'Tomar la merienda', icon: '🍎' }, { text: 'Cenar', icon: '🍽️' }, { text: 'Poner la mesa', icon: '🍴' }, { text: 'Beber agua', icon: '💧' }, { text: 'Probar algo nuevo', icon: '🍓' }, { text: 'Ayudar a cocinar', icon: '🧑‍🍳' }, { text: 'Tomar vitaminas', icon: '💊' } ],
+                    responsabilidades: [ { text: 'Ordenar los juguetes', icon: '📦' }, { text: 'Hacer la cama', icon: '🛏️' }, { text: 'Comida de la mascota', icon: '🐾' }, { text: 'Regar las plantas', icon: '🌱' }, { text: 'Sacar la basura', icon: '🗑️' }, { text: 'Ayudar con el reciclaje', icon: '♻️' }, { text: 'Limpiar mi cuarto', icon: '✨' } ],
+                    calmaYDescanso: [ { text: 'Leer un cuento', icon: '📖' }, { text: 'Momento de calma', icon: '🧘' }, { text: 'Escuchar música', icon: '🎶' }, { text: 'Abrazar', icon: '🤗' }, { text: 'Ir a dormir', icon: '😴' }, { text: 'Despertar', icon: '☀️' }, { text: 'Hacer la siesta', icon: '💤' }, { text: 'Contar cómo fue mi día', icon: '🗣️' } ],
+                    juegoYAprendizaje: [ { text: 'Jugar', icon: '🧸' }, { text: 'Hacer manualidades', icon: '🎨' }, { text: 'Jugar afuera', icon: '🌳' }, { text: 'Hacer los deberes', icon: '📚' }, { text: 'Practicar un deporte', icon: '⚽' }, { text: 'Andar en bicicleta', icon: '🚲' }, { text: 'Hacer un puzzle', icon: '🧩' }, { text: 'Tocar un instrumento', icon: '🎹' } ],
+                    socialEmocional: [ { text: 'Decir "por favor" y "gracias"', icon: '🙏' }, { text: 'Compartir los juguetes', icon: '🤝' }, { text: 'Ayudar a un hermano/a', icon: '❤️' }, { text: 'Hablar de mis emociones', icon: '😊' }, { text: 'Pedir perdón', icon: '😔' }, { text: 'Ser amable', icon: '🥰' } ],
+                    salidasYPaseos: [ { text: 'Preparar la mochila', icon: '🎒' }, { text: 'Ir al colegio/jardín', icon: '🏫' }, { text: 'Ir al parque', icon: '🏞️' }, { text: 'Visitar a los abuelos', icon: '👵' }, { text: 'Ir al doctor', icon: '🩺' } ]
                 };
                 Object.values(lib).forEach(category => category.forEach(task => { task.stars = 1; }));
                 return lib;
@@ -262,7 +264,7 @@
                         <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-blue-500 h-2.5 rounded-full progress-bar-fill" style="width: ${progress}%"></div></div>
                     </header>
                     <div class="flex justify-between items-center mb-6 no-print">
-                        <div class="flex space-x-2 overflow-x-auto pb-2">${daysOfWeek.map(day => `<button class="day-selector modern-button text-sm sm:text-base py-2 px-4 whitespace-nowrap ${state.currentDay === day ? 'modern-button-primary' : 'bg-white'}" data-day="${day}">${day}">${day}</button>`).join('')}</div>
+                        <div class="flex space-x-2 overflow-x-auto pb-2">${daysOfWeek.map(day => `<button class="day-selector modern-button text-sm sm:text-base py-2 px-4 whitespace-nowrap ${state.currentDay === day ? 'modern-button-primary' : 'bg-white'}" data-day="${day}">${day}</button>`).join('')}</div>
                         <button id="copy-day-btn" class="modern-button modern-button-secondary p-2 ml-2" title="Copiar rutina del día">📋</button>
                     </div>
                     <main class="grid md:grid-cols-3 gap-6">${renderTaskList('AM', 'Mañana', dayTasks.AM)} ${renderTaskList('PM', 'Tarde', dayTasks.PM)} ${renderTaskList('Noche', 'Noche', dayTasks.Noche)}</main>`;
@@ -297,7 +299,7 @@
             }
             function renderAvatars() { $('#avatar-selection').innerHTML = Object.keys(avatars).map((key, i) => `<div><input type="radio" id="avatar-${key}" name="avatar" value="${key}" class="hidden" ${i === 0 ? 'checked' : ''}><label for="avatar-${key}" class="cursor-pointer p-2 rounded-full border-4 border-transparent text-5xl transition-all duration-200 hover:bg-blue-100">${avatars[key].emoji}</label></div>`).join(''); }
             function renderTaskLibrary() {
-                const catNames = { higiene: "Higiene", vestimenta: "Vestimenta", comidas: "Comidas", responsabilidades: "Responsabilidades", calmaYDescanso: "Calma y Descanso", juegoYAprendizaje: "Juego y Aprendizaje" };
+                const catNames = { higiene: "Higiene", vestimenta: "Vestimenta", comidas: "Comidas", responsabilidades: "Responsabilidades", calmaYDescanso: "Calma y Descanso", juegoYAprendizaje: "Juego y Aprendizaje", socialEmocional: "Social y Emocional", salidasYPaseos: "Salidas y Paseos" };
                 $('#library-content').innerHTML = Object.keys(taskLibrary).map(cat => `<div class="mb-4"><h3 class="text-lg font-bold text-left text-blue-600 p-1">${catNames[cat]}</h3><div class="flex flex-wrap">${taskLibrary[cat].map(task => `<button class="library-task-btn modern-button bg-white p-2 m-1 flex items-center text-left" data-text="${task.text}" data-icon="${task.icon}"><div class="icon-container !mr-2">${task.icon}</div><span class="font-semibold">${task.text}</span></button>`).join('')}</div></div>`).join('');
             }
             function renderRewardStore() {
