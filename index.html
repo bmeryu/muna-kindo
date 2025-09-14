@@ -13,18 +13,18 @@
         /* Diseño 2025 */
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #F8F9FA; /* Un blanco más suave */
-            color: #212529; /* Negro suave */
+            background-color: #F8F9FA;
+            color: #212529;
         }
         .modern-card {
             background-color: #FFFFFF;
-            border-radius: 1.25rem; /* 20px */
+            border-radius: 1.25rem;
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             border: 1px solid #E5E7EB;
             transition: all 0.3s ease;
         }
         .modern-button {
-            border-radius: 0.75rem; /* 12px */
+            border-radius: 0.75rem;
             font-weight: 700;
             transition: all 0.2s ease-in-out;
             box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -33,16 +33,11 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
-        .modern-button-primary {
-            background-color: #3B82F6; /* Azul Vibrante */
-            color: white;
-        }
-        .modern-button-secondary {
-            background-color: #E5E7EB;
-            color: #374151;
-        }
+        .modern-button-primary { background-color: #3B82F6; color: white; }
+        .modern-button-secondary { background-color: #E5E7EB; color: #374151; }
 
         .task-checkbox:checked + label { text-decoration: line-through; color: #9CA3AF; }
+        .task-checkbox:checked + label .task-item { opacity: 0.6; }
         .task-checkbox:checked + label svg.icon-unchecked { display: none; }
         .task-checkbox:checked + label svg.icon-checked { display: inline-block; }
         .progress-bar-fill { transition: width 0.5s ease-in-out; }
@@ -58,16 +53,15 @@
         .dark-mode .bg-purple-100 { background-color: #5B21B6; }
         .dark-mode .day-selector.bg-white { background-color: #374151; }
         .dark-mode .bg-gray-100, .dark-mode .bg-gray-50 { background-color: #374151; }
-        .dark-mode #settings-modal input, .dark-mode #setup-modal input, .dark-mode #setup-modal select, .dark-mode #new-task-AM, .dark-mode #new-task-PM, .dark-mode #new-task-Noche { background-color: #4B5563; border-color: #6B7280; color: #F9FAFB; }
+        .dark-mode #settings-modal input, .dark-mode #setup-modal input, .dark-mode #setup-modal select, .dark-mode input[id^="new-task-"] { background-color: #4B5563; border-color: #6B7280; color: #F9FAFB; }
         
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .reward-item { animation: fadeIn 0.3s ease-out; }
+        .reward-item, .task-item-wrapper { animation: fadeIn 0.3s ease-out; }
         .dragging { opacity: 0.9; box-shadow: inset 3px 3px 6px rgba(0,0,0,0.2), inset -3px -3px 6px rgba(255,255,255,0.2); }
         .drag-over { border-top: 2px dashed #3B82F6; }
 
-        /* Estilo 3D para tarjetas de tarea */
+        /* Estilo 3D para tarjetas de tarea e iconos */
         .task-item {
-            animation: fadeIn 0.3s ease-out;
             background-color: #F8F9FA;
             border-radius: 0.75rem;
             border: 1px solid rgba(255, 255, 255, 0.8);
@@ -78,13 +72,22 @@
             transform: scale(1.02);
             box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.1), -6px -6px 12px rgba(255, 255, 255, 1);
         }
+        .icon-container {
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            border-radius: 12px; font-size: 24px; background-color: #F1F5F9;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.06), inset -2px -2px 4px rgba(255,255,255,1);
+            margin-right: 12px; flex-shrink: 0;
+        }
         .dark-mode .task-item {
-            background-color: #1F2937;
-            border-color: #374151;
+            background-color: #1F2937; border-color: #374151;
             box-shadow: 4px 4px 8px #111827, -4px -4px 8px #2d3a4b;
         }
         .dark-mode .task-item:hover {
             box-shadow: 6px 6px 12px #111827, -6px -6px 12px #2d3a4b;
+        }
+        .dark-mode .icon-container {
+            background-color: #374151;
+            box-shadow: inset 2px 2px 4px #111827, inset -2px -2px 4px #4b5563;
         }
     </style>
 </head>
@@ -144,7 +147,6 @@
         </div>
     </div>
     
-    <!-- Other Modals (Library, Copy, Logout) -->
     <div id="library-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 no-print"> <div class="modern-card p-6 md:p-8 w-full max-w-2xl relative max-h-[90vh] flex flex-col"><button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-3xl font-bold">&times;</button><h2 class="text-2xl md:text-3xl font-bold text-blue-500 mb-4 text-center">Biblioteca de Tareas</h2><div id="library-content" class="overflow-y-auto text-left"></div></div></div>
     <div id="copy-routine-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 no-print"><div class="modern-card p-6 md:p-8 w-full max-w-md text-center"><button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-3xl font-bold">&times;</button><h2 class="text-xl md:text-2xl font-bold text-blue-500 mb-4">Copiar Rutina del <span id="copy-day-name"></span></h2><p class="text-gray-500 mb-6">Selecciona los días a los que quieres copiar esta rutina.</p><div id="copy-days-selection" class="grid grid-cols-2 gap-4 text-left mb-6"></div><button id="confirm-copy-btn" class="modern-button modern-button-primary py-2 px-6">Copiar</button></div></div>
     <div id="logout-confirm-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 no-print"><div class="modern-card p-6 md:p-8 w-full max-w-sm text-center"><h2 class="text-xl md:text-2xl font-bold text-red-500 mb-4">¿Cerrar Sesión?</h2><p class="text-gray-500 mb-6">Se borrarán todos los datos. ¿Estás seguro?</p><div class="flex justify-center space-x-4"><button id="confirm-logout-btn" class="modern-button bg-red-500 text-white py-2 px-6">Sí, cerrar</button><button id="cancel-logout-btn" class="modern-button modern-button-secondary py-2 px-6">Cancelar</button></div></div></div>
@@ -156,31 +158,21 @@
             const $ = (selector) => document.querySelector(selector);
             const $$ = (selector) => document.querySelectorAll(selector);
 
-            const modals = {
-                setup: $('#setup-modal'),
-                rewardsStore: $('#rewards-store-modal'),
-                library: $('#library-modal'),
-                logout: $('#logout-confirm-modal'),
-                copy: $('#copy-routine-modal'),
-                settings: $('#settings-modal'),
-            };
-
+            const modals = { setup: $('#setup-modal'), rewardsStore: $('#rewards-store-modal'), library: $('#library-modal'), logout: $('#logout-confirm-modal'), copy: $('#copy-routine-modal'), settings: $('#settings-modal'), };
             const synth = window.speechSynthesis;
-           
             const avatars = { bunny: { name: 'Conejito', emoji: '🐰' }, bear: { name: 'Osito', emoji: '🐻' }, monster: { name: 'Monstruito', emoji: '👾' }, dino: { name: 'Dinosaurio', emoji: '🦖' }, fox: { name: 'Zorro', emoji: '🦊' }, panda: { name: 'Panda', emoji: '🐼' } };
             const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
             let state = {};
             let draggedTask = null;
 
-            // --- DATA & STATE ---
             function generateTaskLibrary() {
                 const lib = {
-                    higiene: [ { text: 'Ir al baño', img: 'https://static.arasaac.org/pictograms/2959/2959_300.png' }, { text: 'Lavarse las manos', img: 'https://static.arasaac.org/pictograms/3236/3236_300.png' }, { text: 'Lavarse los dientes', img: 'https://static.arasaac.org/pictograms/3235/3235_300.png' }, { text: 'Peinarse', img: 'https://static.arasaac.org/pictograms/3241/3241_300.png' }, { text: 'Ducharse o bañarse', img: 'https://static.arasaac.org/pictograms/2439/2439_300.png' } ],
-                    vestimenta: [ { text: 'Vestirse', img: 'https://static.arasaac.org/pictograms/3245/3245_300.png' }, { text: 'Ponerse el pijama', img: 'https://static.arasaac.org/pictograms/3326/3326_300.png' }, { text: 'Elegir la ropa', img: 'https://static.arasaac.org/pictograms/30739/30739_300.png' }, { text: 'Ponerse los zapatos', img: 'https://static.arasaac.org/pictograms/3248/3248_300.png' }, { text: 'Ropa sucia al cesto', img: 'https://static.arasaac.org/pictograms/4572/4572_300.png' } ],
-                    comidas: [ { text: 'Desayunar', img: 'https://static.arasaac.org/pictograms/2419/2419_300.png' }, { text: 'Comer', img: 'https://static.arasaac.org/pictograms/2364/2364_300.png' }, { text: 'Tomar la merienda', img: 'https://static.arasaac.org/pictograms/3277/3277_300.png' }, { text: 'Cenar', img: 'https://static.arasaac.org/pictograms/2320/2320_300.png' }, { text: 'Poner la mesa', img: 'https://static.arasaac.org/pictograms/3333/3333_300.png' }, { text: 'Beber agua', img: 'https://static.arasaac.org/pictograms/2289/2289_300.png' } ],
-                    responsabilidades: [ { text: 'Ordenar los juguetes', img: 'https://static.arasaac.org/pictograms/3349/3349_300.png' }, { text: 'Hacer la cama', img: 'https://static.arasaac.org/pictograms/2686/2686_300.png' }, { text: 'Comida de la mascota', img: 'https://static.arasaac.org/pictograms/3267/3267_300.png' }, { text: 'Regar las plantas', img: 'https://static.arasaac.org/pictograms/3350/3350_300.png' } ],
-                    calmaYDescanso: [ { text: 'Leer un cuento', img: 'https://static.arasaac.org/pictograms/3108/3108_300.png' }, { text: 'Momento de calma', img: 'https://static.arasaac.org/pictograms/7041/7041_300.png' }, { text: 'Escuchar música', img: 'https://static.arasaac.org/pictograms/2549/2549_300.png' }, { text: 'Abrazar', img: 'https://static.arasaac.org/pictograms/2244/2244_300.png' }, { text: 'Ir a dormir', img: 'https://static.arasaac.org/pictograms/2434/2434_300.png' }, { text: 'Despertar', img: 'https://static.arasaac.org/pictograms/2420/2420_300.png' } ],
-                    juegoYAprendizaje: [ { text: 'Jugar', img: 'https://static.arasaac.org/pictograms/2898/2898_300.png' }, { text: 'Hacer manualidades', img: 'https://static.arasaac.org/pictograms/2795/2795_300.png' }, { text: 'Jugar afuera', img: 'https://static.arasaac.org/pictograms/3201/3201_300.png' }, { text: 'Hacer los deberes', img: 'https://static.arasaac.org/pictograms/2425/2425_300.png' } ]
+                    higiene: [ { text: 'Ir al baño', icon: '🚽' }, { text: 'Lavarse las manos', icon: '🧼' }, { text: 'Lavarse los dientes', icon: '🦷' }, { text: 'Peinarse', icon: '🎀' }, { text: 'Ducharse o bañarse', icon: '🛁' } ],
+                    vestimenta: [ { text: 'Vestirse', icon: '👕' }, { text: 'Ponerse el pijama', icon: '🌙' }, { text: 'Elegir la ropa', icon: '🤔' }, { text: 'Ponerse los zapatos', icon: '👟' }, { text: 'Ropa sucia al cesto', icon: '🧺' } ],
+                    comidas: [ { text: 'Desayunar', icon: '🥣' }, { text: 'Comer', icon: '🥗' }, { text: 'Tomar la merienda', icon: '🍎' }, { text: 'Cenar', icon: '🍽️' }, { text: 'Poner la mesa', icon: '🍴' }, { text: 'Beber agua', icon: '💧' } ],
+                    responsabilidades: [ { text: 'Ordenar los juguetes', icon: '📦' }, { text: 'Hacer la cama', icon: '🛏️' }, { text: 'Comida de la mascota', icon: '🐾' }, { text: 'Regar las plantas', icon: '🌱' } ],
+                    calmaYDescanso: [ { text: 'Leer un cuento', icon: '📖' }, { text: 'Momento de calma', icon: '🧘' }, { text: 'Escuchar música', icon: '🎶' }, { text: 'Abrazar', icon: '🤗' }, { text: 'Ir a dormir', icon: '😴' }, { text: 'Despertar', icon: '☀️' } ],
+                    juegoYAprendizaje: [ { text: 'Jugar', icon: '🧸' }, { text: 'Hacer manualidades', icon: '🎨' }, { text: 'Jugar afuera', icon: '🌳' }, { text: 'Hacer los deberes', icon: '📚' } ]
                 };
                 Object.values(lib).forEach(category => category.forEach(task => { task.stars = 1; }));
                 return lib;
@@ -198,48 +190,37 @@
                 const savedState = localStorage.getItem('miRutinaDivertida_v2');
                 if (savedState) {
                     state = JSON.parse(savedState);
-                    if (state.customRewards === undefined) { state.customRewards = []; }
-                    if (state.starBalance === undefined) { state.starBalance = 0; }
+                    if (state.customRewards === undefined) state.customRewards = [];
+                    if (state.starBalance === undefined) state.starBalance = 0;
 
                     // --- MIGRATION LOGIC ---
                     if (state.tasks && Object.keys(state.tasks).length > 0) {
                         let wasMigrated = false;
-                        const fullLibraryMap = new Map();
-                        Object.values(taskLibrary).flat().forEach(libTask => {
-                            fullLibraryMap.set(libTask.text, libTask.img);
-                        });
-
+                        const emojiMap = new Map();
+                        Object.values(taskLibrary).flat().forEach(libTask => emojiMap.set(libTask.text, libTask.icon));
+                        
                         Object.values(state.tasks).forEach(day => {
                             Object.values(day).forEach(periodTasks => {
-                                for (let i = 0; i < periodTasks.length; i++) {
-                                    const task = periodTasks[i];
-                                    if (task.hasOwnProperty('t') || task.hasOwnProperty('i')) {
+                                periodTasks.forEach(task => {
+                                    if (task.hasOwnProperty('img') || task.hasOwnProperty('t') || task.hasOwnProperty('i')) {
                                         wasMigrated = true;
-                                        const newText = task.t || task.text;
-                                        const newImg = fullLibraryMap.get(newText) || 'https://static.arasaac.org/pictograms/2750/2750_300.png';
-                                        
-                                        periodTasks[i] = {
-                                            text: newText,
-                                            img: newImg,
-                                            done: task.done || false,
-                                            stars: task.stars || 1
-                                        };
+                                        const originalText = task.text || task.t;
+                                        task.text = originalText;
+                                        task.icon = emojiMap.get(originalText) || '✏️';
+                                        delete task.img;
+                                        delete task.t;
+                                        delete task.i;
                                     }
-                                }
+                                });
                             });
                         });
-                        if (wasMigrated) {
-                            saveState();
-                        }
+                        if (wasMigrated) saveState();
                     }
-                    // --- END MIGRATION LOGIC ---
-
                     if(state.darkMode) document.body.classList.add('dark-mode');
                 } 
                 else { resetState(); }
             }
             
-            // --- INITIALIZATION ---
             function initialize() {
                 loadState();
                 renderAvatars();
@@ -259,7 +240,6 @@
                 daysOfWeek.forEach(day => { state.tasks[day] = JSON.parse(JSON.stringify(selectedRoutine)); });
             }
 
-            // --- RENDER FUNCTIONS ---
             function renderApp() {
                 const dayTasks = state.tasks[state.currentDay] || routines.toddler;
                 const allDayTasks = [...dayTasks.AM, ...dayTasks.PM, ...dayTasks.Noche];
@@ -280,7 +260,7 @@
                         <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-blue-500 h-2.5 rounded-full progress-bar-fill" style="width: ${progress}%"></div></div>
                     </header>
                     <div class="flex justify-between items-center mb-6 no-print">
-                        <div class="flex space-x-2 overflow-x-auto pb-2">${daysOfWeek.map(day => `<button class="day-selector modern-button text-sm sm:text-base py-2 px-4 whitespace-nowrap ${state.currentDay === day ? 'modern-button-primary' : 'bg-white'}" data-day="${day}">${day}</button>`).join('')}</div>
+                        <div class="flex space-x-2 overflow-x-auto pb-2">${daysOfWeek.map(day => `<button class="day-selector modern-button text-sm sm:text-base py-2 px-4 whitespace-nowrap ${state.currentDay === day ? 'modern-button-primary' : 'bg-white'}" data-day="${day}">${day}">${day}</button>`).join('')}</div>
                         <button id="copy-day-btn" class="modern-button modern-button-secondary p-2 ml-2" title="Copiar rutina del día">📋</button>
                     </div>
                     <main class="grid md:grid-cols-3 gap-6">${renderTaskList('AM', 'Mañana', dayTasks.AM)} ${renderTaskList('PM', 'Tarde', dayTasks.PM)} ${renderTaskList('Noche', 'Noche', dayTasks.Noche)}</main>`;
@@ -297,24 +277,26 @@
                     </div>`;
             }
             function renderTaskItem(task, period, index) { 
-                return `<li class="task-item flex items-center p-2 ${task.done ? 'opacity-50' : ''}" draggable="true" data-period="${period}" data-index="${index}">
+                return `<li class="task-item-wrapper" draggable="true" data-period="${period}" data-index="${index}">
                             <input type="checkbox" id="task-${period}-${index}" class="hidden task-checkbox" ${task.done ? 'checked' : ''} data-period="${period}" data-index="${index}">
                             <label for="task-${period}-${index}" class="flex items-center grow cursor-pointer">
-                                <img src="${task.img}" alt="${task.text}" class="w-10 h-10 mr-3 object-contain flex-shrink-0">
-                                <span class="grow text-gray-700 font-semibold" contenteditable="true" data-period="${period}" data-index="${index}">${task.text}</span>
-                                <div class="flex-none w-8 h-8 mr-2 flex items-center justify-center">
-                                    <svg class="icon-unchecked w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    <svg class="icon-checked hidden w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <div class="task-item flex items-center p-2 w-full">
+                                    <div class="icon-container">${task.icon}</div>
+                                    <span class="grow text-gray-700 font-semibold" contenteditable="true" data-period="${period}" data-index="${index}">${task.text}</span>
+                                    <div class="flex-none w-8 h-8 mr-2 flex items-center justify-center">
+                                        <svg class="icon-unchecked w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <svg class="icon-checked hidden w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <button class="speak-btn text-gray-400 hover:text-blue-500 text-xl" data-text="${task.text}">🔊</button>
+                                    <button class="delete-btn text-gray-400 hover:text-red-500 text-xl ml-1" data-period="${period}" data-index="${index}">🗑️</button>
                                 </div>
                             </label>
-                            <button class="speak-btn text-gray-400 hover:text-blue-500 text-xl" data-text="${task.text}">🔊</button>
-                            <button class="delete-btn text-gray-400 hover:text-red-500 text-xl ml-1" data-period="${period}" data-index="${index}">🗑️</button>
                         </li>`; 
             }
             function renderAvatars() { $('#avatar-selection').innerHTML = Object.keys(avatars).map((key, i) => `<div><input type="radio" id="avatar-${key}" name="avatar" value="${key}" class="hidden" ${i === 0 ? 'checked' : ''}><label for="avatar-${key}" class="cursor-pointer p-2 rounded-full border-4 border-transparent text-5xl transition-all duration-200 hover:bg-blue-100">${avatars[key].emoji}</label></div>`).join(''); }
             function renderTaskLibrary() {
                 const catNames = { higiene: "Higiene", vestimenta: "Vestimenta", comidas: "Comidas", responsabilidades: "Responsabilidades", calmaYDescanso: "Calma y Descanso", juegoYAprendizaje: "Juego y Aprendizaje" };
-                $('#library-content').innerHTML = Object.keys(taskLibrary).map(cat => `<div class="mb-4"><h3 class="text-lg font-bold text-left text-blue-600 p-1">${catNames[cat]}</h3><div class="flex flex-wrap">${taskLibrary[cat].map(task => `<button class="library-task-btn modern-button bg-white p-2 m-1 flex items-center text-left" data-text="${task.text}" data-img="${task.img}"><img src="${task.img}" alt="${task.text}" class="w-10 h-10 mr-2 object-contain"><span class="font-semibold">${task.text}</span></button>`).join('')}</div></div>`).join('');
+                $('#library-content').innerHTML = Object.keys(taskLibrary).map(cat => `<div class="mb-4"><h3 class="text-lg font-bold text-left text-blue-600 p-1">${catNames[cat]}</h3><div class="flex flex-wrap">${taskLibrary[cat].map(task => `<button class="library-task-btn modern-button bg-white p-2 m-1 flex items-center text-left" data-text="${task.text}" data-icon="${task.icon}"><div class="icon-container !mr-2">${task.icon}</div><span class="font-semibold">${task.text}</span></button>`).join('')}</div></div>`).join('');
             }
             function renderRewardStore() {
                 const grid = $('#rewards-store-grid');
@@ -329,53 +311,31 @@
                     : state.customRewards.map((r, i) => `<div class="flex items-center justify-between p-2 bg-white rounded-lg mb-2"><span>${r.icon} ${r.text} - <b>${r.cost}🌟</b></span><button data-index="${i}" class="delete-reward-btn text-red-500 font-bold text-2xl">&times;</button></div>`).join('');
             }
             
-            // --- EVENT HANDLERS ---
             function addEventListeners() {
-                // Main Page
                 $$('.day-selector').forEach(b => b.addEventListener('click', e => { state.currentDay = e.target.dataset.day; renderApp(); }));
                 $$('.task-checkbox').forEach(cb => cb.addEventListener('change', e => handleTaskCheck(e.target.dataset.period, e.target.dataset.index, e.target.checked)));
-                $$('.add-task-btn').forEach(b => b.addEventListener('click', e => {
-                    const period = e.target.dataset.period;
-                    const input = $(`#new-task-${period}`);
-                    if (input.value.trim()) { state.tasks[state.currentDay][period].push({ text: input.value.trim(), img: 'https://static.arasaac.org/pictograms/2750/2750_300.png', done: false, stars: 1 }); input.value = ''; saveAndRender(); }
-                }));
-                $$('[contenteditable="true"]').forEach(s => {
-                    s.addEventListener('blur', e => { state.tasks[state.currentDay][e.target.dataset.period][e.target.dataset.index].text = e.target.innerText; saveState(); });
-                    s.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
-                });
+                $$('.add-task-btn').forEach(b => b.addEventListener('click', e => { const period = e.target.dataset.period; const input = $(`#new-task-${period}`); if (input.value.trim()) { state.tasks[state.currentDay][period].push({ text: input.value.trim(), icon: '✏️', done: false, stars: 1 }); input.value = ''; saveAndRender(); } }));
+                $$('[contenteditable="true"]').forEach(s => { s.addEventListener('blur', e => { state.tasks[state.currentDay][e.target.dataset.period][e.target.dataset.index].text = e.target.innerText; saveState(); }); s.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } }); });
                 $$('.delete-btn').forEach(b => b.addEventListener('click', e => { const { period, index } = e.currentTarget.dataset; state.tasks[state.currentDay][period].splice(index, 1); saveAndRender(); }));
                 $$('.speak-btn').forEach(b => b.addEventListener('click', e => { const u = new SpeechSynthesisUtterance(e.currentTarget.dataset.text); u.lang = 'es-ES'; synth.speak(u); }));
                 
-                // Header & Modals
                 $('#rewards-store-btn').addEventListener('click', () => { renderRewardStore(); modals.rewardsStore.style.display = 'flex'; });
                 $('#settings-btn').addEventListener('click', () => { renderCustomRewardsList(); modals.settings.style.display = 'flex'; });
                 $('#logout-btn').addEventListener('click', () => modals.logout.style.display = 'flex');
-                $('#copy-day-btn').addEventListener('click', handleOpenCopyModal);
+                $('#copy-day-btn').addEventListener('click', () => { $('#copy-day-name').textContent = state.currentDay; $('#copy-days-selection').innerHTML = daysOfWeek.filter(d => d !== state.currentDay).map(day => `<label class="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-100 cursor-pointer"><input type="checkbox" class="form-checkbox h-5 w-5 text-blue-500 rounded" value="${day}"><span class="font-semibold">${day}</span></label>`).join(''); modals.copy.style.display = 'flex'; });
                 $$('.close-modal-btn').forEach(btn => btn.addEventListener('click', (e) => e.target.closest('.fixed').style.display = 'none'));
                 $('#cancel-logout-btn').addEventListener('click', () => modals.logout.style.display = 'none');
                 $('#confirm-logout-btn').addEventListener('click', () => { localStorage.removeItem('miRutinaDivertida_v2'); location.reload(); });
-                $('#confirm-copy-btn').addEventListener('click', handleConfirmCopy);
+                $('#confirm-copy-btn').addEventListener('click', () => { $$('#copy-days-selection input:checked').forEach(cb => { state.tasks[cb.value] = JSON.parse(JSON.stringify(state.tasks[state.currentDay])); }); modals.copy.style.display = 'none'; saveAndRender(); showNotification(`Rutina copiada!`); });
                 $$('.open-library-btn').forEach(b => b.addEventListener('click', e => { modals.library.dataset.period = e.currentTarget.dataset.period; modals.library.style.display = 'flex'; }));
                 
-                // Settings Modal
-                $('#add-reward-btn').addEventListener('click', () => {
-                    const text = $('#reward-text').value.trim(); const icon = $('#reward-icon').value.trim(); const cost = parseInt($('#reward-cost').value);
-                    if(text && icon && cost > 0) { state.customRewards.push({ text, icon, cost }); saveState(); renderCustomRewardsList(); $('#reward-text').value = $('#reward-icon').value = $('#reward-cost').value = ''; }
-                });
+                $('#add-reward-btn').addEventListener('click', () => { const text = $('#reward-text').value.trim(); const icon = $('#reward-icon').value.trim(); const cost = parseInt($('#reward-cost').value); if(text && icon && cost > 0) { state.customRewards.push({ text, icon, cost }); saveState(); renderCustomRewardsList(); $('#reward-text').value = $('#reward-icon').value = $('#reward-cost').value = ''; } });
 
-                // Dynamic Listeners
                 document.body.addEventListener('click', e => {
                     if (e.target.matches('.delete-reward-btn')) { state.customRewards.splice(e.target.dataset.index, 1); saveState(); renderCustomRewardsList(); }
-                    if (e.target.matches('.redeem-reward-btn')) { const reward = state.customRewards[e.target.dataset.index]; if(state.starBalance >= reward.cost) { state.starBalance -= reward.cost; showNotification(`¡${reward.text} canjeado!`); saveState(); renderRewardStore(); } }
-                    
+                    if (e.target.matches('.redeem-reward-btn')) { const reward = state.customRewards[e.target.dataset.index]; if(state.starBalance >= reward.cost) { state.starBalance -= reward.cost; showNotification(`¡${reward.text} canjeado!`); saveState(); renderRewardStore(); renderApp(); } }
                     const libraryBtn = e.target.closest('.library-task-btn');
-                    if (libraryBtn) { 
-                        const { text, img } = libraryBtn.dataset; 
-                        const period = modals.library.dataset.period; 
-                        state.tasks[state.currentDay][period].push({ text, img, done: false, stars: 1 }); 
-                        modals.library.style.display = 'none'; 
-                        saveAndRender(); 
-                    }
+                    if (libraryBtn) { const { text, icon } = libraryBtn.dataset; const period = modals.library.dataset.period; state.tasks[state.currentDay][period].push({ text, icon, done: false, stars: 1 }); modals.library.style.display = 'none'; saveAndRender(); }
                 });
                 
                 addDragDropListeners();
@@ -385,31 +345,14 @@
                 const task = state.tasks[state.currentDay][period][index];
                 if (task.done === isDone) return;
                 task.done = isDone;
-                const starValue = task.stars || 1;
-                state.starBalance += isDone ? starValue : -starValue;
-                if (isDone) { 
-                    confetti({ particleCount: 50, spread: 40, origin: { y: 0.6 } });
-                }
+                state.starBalance += isDone ? (task.stars || 1) : -(task.stars || 1);
+                if (isDone) confetti({ particleCount: 50, spread: 40, origin: { y: 0.6 } });
                 saveAndRender();
             }
             
-            function handleOpenCopyModal() {
-                $('#copy-day-name').textContent = state.currentDay;
-                $('#copy-days-selection').innerHTML = daysOfWeek.filter(d => d !== state.currentDay).map(day => `<label class="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-100 cursor-pointer"><input type="checkbox" class="form-checkbox h-5 w-5 text-blue-500 rounded" value="${day}"><span class="font-semibold">${day}</span></label>`).join('');
-                modals.copy.style.display = 'flex';
-            }
-            function handleConfirmCopy() {
-                const routineToCopy = JSON.parse(JSON.stringify(state.tasks[state.currentDay]));
-                $$('#copy-days-selection input:checked').forEach(cb => { state.tasks[cb.value] = JSON.parse(JSON.stringify(routineToCopy)); });
-                modals.copy.style.display = 'none';
-                saveAndRender();
-                showNotification(`Rutina copiada!`);
-            }
-            
-            // --- Drag & Drop ---
             function addDragDropListeners() {
-                 $$('.task-item').forEach(i => { i.addEventListener('dragstart', e => { draggedTask = e.target; setTimeout(() => e.target.classList.add('dragging'), 0); }); i.addEventListener('dragend', () => draggedTask.classList.remove('dragging')); });
-                 $$('.task-list').forEach(l => { l.addEventListener('dragover', e => e.preventDefault()); l.addEventListener('drop', e => { e.preventDefault(); const toPeriod = e.currentTarget.dataset.period; const targetEl = e.target.closest('.task-item'); const toIndex = targetEl ? parseInt(targetEl.dataset.index) : state.tasks[state.currentDay][toPeriod].length; const taskToMove = state.tasks[state.currentDay][draggedTask.dataset.period].splice(draggedTask.dataset.index, 1)[0]; state.tasks[state.currentDay][toPeriod].splice(toIndex, 0, taskToMove); saveAndRender(); }); });
+                 $$('.task-item-wrapper').forEach(i => { i.addEventListener('dragstart', e => { draggedTask = e.currentTarget; setTimeout(() => e.currentTarget.classList.add('dragging'), 0); }); i.addEventListener('dragend', () => draggedTask.classList.remove('dragging')); });
+                 $$('.task-list').forEach(l => { l.addEventListener('dragover', e => e.preventDefault()); l.addEventListener('drop', e => { e.preventDefault(); const toPeriod = e.currentTarget.dataset.period; const targetEl = e.target.closest('.task-item-wrapper'); const toIndex = targetEl ? parseInt(targetEl.dataset.index) : state.tasks[state.currentDay][toPeriod].length; const taskToMove = state.tasks[state.currentDay][draggedTask.dataset.period].splice(draggedTask.dataset.index, 1)[0]; state.tasks[state.currentDay][toPeriod].splice(toIndex, 0, taskToMove); saveAndRender(); }); });
             }
             
             function showNotification(message) {
