@@ -180,6 +180,38 @@
                     state = JSON.parse(savedState);
                     if (state.customRewards === undefined) { state.customRewards = []; }
                     if (state.starBalance === undefined) { state.starBalance = 0; }
+
+                    // --- MIGRATION LOGIC ---
+                    // This part checks if the saved tasks use the old format (t, i) and converts them to the new format (text, img)
+                    if (state.tasks && Object.keys(state.tasks).length > 0) {
+                        const allLibraryTasksByText = {};
+                        Object.values(taskLibrary).flat().forEach(libTask => {
+                            allLibraryTasksByText[libTask.text] = libTask.img;
+                        });
+                        
+                        Object.values(state.tasks).forEach(day => {
+                            Object.values(day).forEach(periodTasks => {
+                                periodTasks.forEach(task => {
+                                    // If task has 't' property but not 'text', it's the old emoji format
+                                    if (task.t && task.text === undefined) {
+                                        task.text = task.t;
+                                        delete task.t;
+                                        
+                                        // Find the corresponding image from the new library
+                                        if (allLibraryTasksByText[task.text]) {
+                                            task.img = allLibraryTasksByText[task.text];
+                                        } else {
+                                            // Default pictogram for custom tasks from old versions
+                                            task.img = 'https://static.arasaac.org/pictograms/2750/2750_300.png';
+                                        }
+                                        delete task.i;
+                                    }
+                                });
+                            });
+                        });
+                    }
+                    // --- END MIGRATION LOGIC ---
+
                     if(state.darkMode) document.body.classList.add('dark-mode');
                 } 
                 else { resetState(); }
