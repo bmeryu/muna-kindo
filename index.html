@@ -3,539 +3,512 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutinas Mágicas</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+    <title>Mi Rutina Divertida</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Fredoka', sans-serif;
-            background: #fdf5e6; /* Fondo color crema */
-            transition: background-color 0.3s ease;
+            font-family: 'Nunito', sans-serif;
+            background-color: #FFFBF0;
+            color: #4A4A4A;
         }
-        body.night-mode {
-            background-color: #2c3e50; /* Azul oscuro */
-            color: #ecf0f1;
+        /* Estilo Claymorphism / Acuarela Suave */
+        .clay-card {
+            background-color: #FFFFFF;
+            border-radius: 20px;
+            box-shadow: 8px 8px 16px rgba(212, 192, 156, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
         }
-        .text-clay {
-            color: #d2b48c; /* Tonos arcilla */
-        }
-        .confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1000;
-        }
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #f7a5a8;
-            opacity: 0;
-            animation: confetti-fall 3s ease-in-out forwards;
-        }
-        @keyframes confetti-fall {
-            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
-        .checkbox-magic {
+        .clay-button {
+            border-radius: 12px;
+            box-shadow: 4px 4px 8px rgba(212, 192, 156, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8);
             transition: all 0.2s ease-in-out;
         }
-        .checkbox-magic:checked + .task-label {
+        .clay-button:active {
+            box-shadow: inset 4px 4px 8px rgba(212, 192, 156, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+            transform: translateY(2px);
+        }
+        .task-checkbox:checked + label {
             text-decoration: line-through;
-            color: #888;
+            color: #9CA3AF;
         }
-        .progress-bar {
-            background-color: #f2f2f2;
-            border-radius: 9999px;
-            overflow: hidden;
+        .task-checkbox:checked + label svg.icon-unchecked {
+            display: none;
         }
-        .progress-fill {
-            height: 100%;
+        .task-checkbox:checked + label svg.icon-checked {
+            display: inline-block;
+        }
+        .progress-bar-fill {
             transition: width 0.5s ease-in-out;
-            background-color: #4CAF50; /* Verde */
-            background-image: linear-gradient(to right, #6ab187, #4CAF50);
+        }
+        /* Modo Noche */
+        .dark-mode {
+            background-color: #1A202C;
+            color: #E2E8F0;
+        }
+        .dark-mode .clay-card {
+            background-color: #2D3748;
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3), -8px -8px 16px rgba(74, 85, 104, 0.2);
+        }
+        .dark-mode .clay-button {
+            background-color: #4A5568;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3), -4px -4px 8px rgba(74, 85, 104, 0.2);
+        }
+        .dark-mode .clay-button:active {
+             box-shadow: inset 4px 4px 8px rgba(0,0,0, 0.3), inset -4px -4px 8px rgba(74, 85, 104, 0.2);
+        }
+        .dark-mode .text-gray-800 { color: #E2E8F0; }
+        .dark-mode .text-gray-500 { color: #A0AEC0; }
+        .dark-mode .text-amber-600 { color: #F6E05E; }
+        .dark-mode .bg-amber-100 { background-color: #4A5568; }
+        .dark-mode .bg-sky-100 { background-color: #4A5568; }
+        .dark-mode .bg-indigo-100 { background-color: #4A5568; }
+        
+        /* Ocultar en impresión */
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                background-color: #FFFFFF;
+            }
+            .clay-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+            .task-item {
+                page-break-inside: avoid;
+            }
         }
     </style>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Variables globales
-        let db;
-        let auth;
-        let userId;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        let appState = {
-            childName: "Pequeño Héroe",
-            avatar: "🐸",
-            theme: "jungle",
-            tasks: {
-                Lunes: { AM: [], PM: [], Noche: [] },
-                Martes: { AM: [], PM: [], Noche: [] },
-                Miércoles: { AM: [], PM: [], Noche: [] },
-                Jueves: { AM: [], PM: [], Noche: [] },
-                Viernes: { AM: [], PM: [], Noche: [] },
-                Sábado: { AM: [], PM: [], Noche: [] },
-                Domingo: { AM: [], PM: [], Noche: [] }
-            },
-            rewards: []
-        };
-        
-        // Elementos del DOM
-        const appContainer = document.getElementById('app-container');
-        const homeView = document.getElementById('home-view');
-        const tasksContainer = document.getElementById('tasks-container');
-        const rewardsContainer = document.getElementById('rewards-container');
-        const settingsContainer = document.getElementById('settings-container');
-        const confettiContainer = document.getElementById('confetti-container');
-        const progressBar = document.getElementById('progress-bar');
-        const progressBarFill = document.getElementById('progress-bar-fill');
-        const addChildForm = document.getElementById('add-child-form');
-        const childNameInput = document.getElementById('child-name-input');
-        const childAvatarSelect = document.getElementById('child-avatar-select');
-        const saveSettingsBtn = document.getElementById('save-settings-btn');
-        const addTaskForm = document.getElementById('add-task-form');
-        const addTaskInput = document.getElementById('add-task-input');
-        const addTaskBtn = document.getElementById('add-task-btn');
-        const activeDayEl = document.getElementById('active-day');
-        const activeTimeEl = document.getElementById('active-time');
-        const currentUserIdDisplay = document.getElementById('current-user-id');
-        const welcomeMessage = document.getElementById('welcome-message');
-
-        let activeDay = "Lunes";
-        let activeTime = "AM";
-        const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-        const times = ["AM", "PM", "Noche"];
-        const predefinedTasks = [
-            "Lavarse los dientes",
-            "Hacer la cama",
-            "Ponerse el pijama",
-            "Ordenar los juguetes",
-            "Comer vegetales",
-            "Leer un cuento"
-        ];
-        const avatars = ["🐸", "🐰", "🐻", "🦖", "🦄", "🐼"];
-
-        // Inicialización de Firebase
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    userId = user.uid;
-                    currentUserIdDisplay.textContent = `ID de sesión: ${userId}`;
-                    
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'rutinas_magicas');
-                    
-                    onSnapshot(docRef, (docSnap) => {
-                        if (docSnap.exists() && docSnap.data().data) {
-                            appState = JSON.parse(docSnap.data().data);
-                            renderUI();
-                        } else {
-                            // Cargar tareas predefinidas si no hay datos
-                            days.forEach(day => {
-                                appState.tasks[day].AM = predefinedTasks.slice(0, 2).map(text => ({ text, completed: false }));
-                                appState.tasks[day].PM = predefinedTasks.slice(2, 4).map(text => ({ text, completed: false }));
-                                appState.tasks[day].Noche = predefinedTasks.slice(4, 6).map(text => ({ text, completed: false }));
-                            });
-                            saveData();
-                            renderUI();
-                        }
-                    }, (error) => {
-                        console.error("Error al escuchar los cambios:", error);
-                        // En caso de error, inicializar con datos locales
-                        renderUI();
-                    });
-
-                } else {
-                    await signInAnonymously(auth);
-                }
-            });
-        } catch (error) {
-            console.error("Error al inicializar Firebase:", error);
-            // Fallback en caso de que Firebase falle
-            renderUI();
-        }
-        
-        // --- Funciones de Lógica de la Aplicación ---
-        function saveData() {
-            if (db && userId) {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'rutinas_magicas');
-                setDoc(docRef, { data: JSON.stringify(appState) })
-                    .catch(error => console.error("Error al guardar datos:", error));
-            }
-        }
-        
-        function renderUI() {
-            renderHeader();
-            renderTasks();
-            renderRewards();
-            updateProgressBar();
-            renderDaySelectors();
-            renderTimeSelectors();
-        }
-
-        function renderHeader() {
-            welcomeMessage.textContent = `¡Hola, ${appState.childName}!`;
-        }
-
-        function renderDaySelectors() {
-            const daySelectors = document.getElementById('day-selectors');
-            daySelectors.innerHTML = '';
-            days.forEach(day => {
-                const button = document.createElement('button');
-                button.textContent = day;
-                button.classList.add('px-3', 'py-1', 'rounded-full', 'font-bold', 'transition-all', 'duration-300', 'text-sm');
-                if (day === activeDay) {
-                    button.classList.add('bg-orange-400', 'text-white', 'shadow-md');
-                } else {
-                    button.classList.add('bg-white', 'text-gray-600', 'shadow-sm', 'hover:bg-orange-200');
-                }
-                button.onclick = () => {
-                    activeDay = day;
-                    renderUI();
-                };
-                daySelectors.appendChild(button);
-            });
-            activeDayEl.textContent = activeDay;
-        }
-
-        function renderTimeSelectors() {
-            const timeSelectors = document.getElementById('time-selectors');
-            timeSelectors.innerHTML = '';
-            times.forEach(time => {
-                const button = document.createElement('button');
-                button.textContent = time;
-                button.classList.add('px-3', 'py-1', 'rounded-full', 'font-bold', 'transition-all', 'duration-300', 'text-sm');
-                if (time === activeTime) {
-                    button.classList.add('bg-pink-400', 'text-white', 'shadow-md');
-                } else {
-                    button.classList.add('bg-white', 'text-gray-600', 'shadow-sm', 'hover:bg-pink-200');
-                }
-                button.onclick = () => {
-                    activeTime = time;
-                    renderUI();
-                };
-                timeSelectors.appendChild(button);
-            });
-            activeTimeEl.textContent = activeTime;
-        }
-        
-        function renderTasks() {
-            tasksContainer.innerHTML = '';
-            const tasks = appState.tasks[activeDay][activeTime];
-            if (!tasks || tasks.length === 0) {
-                tasksContainer.innerHTML = '<p class="text-gray-500 italic text-center">¡No hay tareas para esta franja horaria!</p>';
-                return;
-            }
-
-            tasks.forEach((task, index) => {
-                const taskEl = document.createElement('div');
-                taskEl.classList.add('bg-white', 'p-4', 'rounded-xl', 'shadow-md', 'flex', 'items-center', 'space-x-4', 'mb-3', 'cursor-pointer', 'transform', 'transition-all', 'duration-200', 'hover:scale-105');
-                
-                // Checkbox grande y colorido
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = task.completed;
-                checkbox.classList.add('w-8', 'h-8', 'rounded-full', 'appearance-none', 'border-4', 'border-pink-300', 'bg-white', 'checked:bg-pink-400', 'checked:border-pink-500', 'checkbox-magic');
-                checkbox.onclick = (e) => handleTaskCompletion(index, e.target.checked);
-
-                const label = document.createElement('label');
-                label.classList.add('flex-1', 'text-lg', 'task-label', 'font-semibold', 'text-gray-700', 'flex', 'items-center', 'gap-2');
-                
-                // Iconos
-                let icon = '';
-                if (task.text.toLowerCase().includes('dientes')) icon = '🦷';
-                else if (task.text.toLowerCase().includes('cama')) icon = '🛏️';
-                else if (task.text.toLowerCase().includes('juguetes')) icon = '🧸';
-                else if (task.text.toLowerCase().includes('pijama')) icon = '👕';
-                else if (task.text.toLowerCase().includes('cuento')) icon = '📖';
-                else if (task.text.toLowerCase().includes('comer')) icon = '🍎';
-                else icon = '✔️';
-
-                label.innerHTML = `<span class="text-2xl">${icon}</span> <span>${task.text}</span>`;
-                
-                taskEl.appendChild(checkbox);
-                taskEl.appendChild(label);
-                
-                // Botón de eliminar (visible para cuidadores)
-                const deleteBtn = document.createElement('button');
-                deleteBtn.innerHTML = '🗑️';
-                deleteBtn.classList.add('text-2xl', 'p-2', 'rounded-full', 'hover:bg-gray-200', 'hidden', 'caregiver-tool');
-                deleteBtn.onclick = () => deleteTask(index);
-                taskEl.appendChild(deleteBtn);
-
-                tasksContainer.appendChild(taskEl);
-            });
-        }
-
-        function renderRewards() {
-            rewardsContainer.innerHTML = '';
-            if (appState.rewards.length === 0) {
-                rewardsContainer.innerHTML = '<p class="text-gray-500 italic text-center p-4">¡Aún no has ganado recompensas!</p>';
-                return;
-            }
-            appState.rewards.forEach(reward => {
-                const rewardEl = document.createElement('div');
-                rewardEl.classList.add('bg-white', 'p-2', 'rounded-lg', 'text-center', 'shadow-md');
-                rewardEl.innerHTML = `<span class="text-4xl">${reward.sticker}</span><p class="text-sm font-semibold text-gray-700 mt-1">${reward.text}</p>`;
-                rewardsContainer.appendChild(rewardEl);
-            });
-        }
-
-        function updateProgressBar() {
-            const allTasksToday = appState.tasks[activeDay].AM.concat(appState.tasks[activeDay].PM, appState.tasks[activeDay].Noche);
-            const completedTasks = allTasksToday.filter(task => task.completed).length;
-            const totalTasks = allTasksToday.length;
-            const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-            progressBarFill.style.width = `${progress}%`;
-
-            if (progress === 100 && totalTasks > 0) {
-                setTimeout(() => {
-                    createConfetti();
-                    // Simulamos que el niño recibe una recompensa por completar el día
-                    const newReward = { text: "¡Día completado!", sticker: "🌟" };
-                    appState.rewards.push(newReward);
-                    saveData();
-                    renderRewards();
-                }, 500);
-            }
-        }
-
-        function handleTaskCompletion(index, isCompleted) {
-            appState.tasks[activeDay][activeTime][index].completed = isCompleted;
-            
-            if (isCompleted) {
-                createConfetti();
-            } else {
-                // Si desmarca, también borramos la animación de confeti
-            }
-            saveData();
-            updateProgressBar();
-        }
-
-        function addTask(text) {
-            if (text.trim() === "") return;
-            const newTask = { text: text, completed: false };
-            appState.tasks[activeDay][activeTime].push(newTask);
-            saveData();
-            renderTasks();
-            addTaskInput.value = "";
-        }
-
-        function deleteTask(index) {
-            appState.tasks[activeDay][activeTime].splice(index, 1);
-            saveData();
-            renderTasks();
-            updateProgressBar();
-        }
-
-        function createConfetti() {
-            const colors = ['#f7a5a8', '#fecaca', '#fcd34d', '#bae6fd', '#c084fc'];
-            for (let i = 0; i < 50; i++) {
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti');
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.animationDelay = Math.random() * 2 + 's';
-                confettiContainer.appendChild(confetti);
-            }
-            setTimeout(() => {
-                confettiContainer.innerHTML = '';
-            }, 3000);
-        }
-
-        // --- Event Listeners y Funciones del Panel de Control ---
-        function showView(viewId) {
-            const views = [homeView, rewardsContainer, settingsContainer];
-            views.forEach(view => view.classList.add('hidden'));
-            document.getElementById(viewId).classList.remove('hidden');
-        }
-
-        document.getElementById('nav-home').onclick = () => showView('home-view');
-        document.getElementById('nav-rewards').onclick = () => showView('rewards-view');
-        document.getElementById('nav-settings').onclick = () => showView('settings-view');
-        
-        // Evento para guardar la configuración del niño
-        saveSettingsBtn.onclick = () => {
-            const newName = childNameInput.value.trim();
-            const newAvatar = childAvatarSelect.value;
-            if (newName) {
-                appState.childName = newName;
-                appState.avatar = newAvatar;
-                saveData();
-                renderUI();
-                showView('home-view');
-            }
-        };
-
-        // Evento para agregar una nueva tarea
-        addTaskBtn.onclick = (e) => {
-            e.preventDefault();
-            addTask(addTaskInput.value);
-        };
-
-        // Evento para alternar modo noche
-        document.getElementById('night-mode-toggle').onclick = () => {
-            document.body.classList.toggle('night-mode');
-        };
-
-        // Evento para el botón de impresión
-        document.getElementById('print-btn').onclick = () => {
-            const printContent = document.getElementById('printable-content').cloneNode(true);
-            const originalBody = document.body.innerHTML;
-            document.body.innerHTML = '';
-            document.body.appendChild(printContent);
-            window.print();
-            document.body.innerHTML = originalBody;
-            location.reload(); // Recargar para restaurar la página
-        };
-
-        // Evento para el botón de narración (simulado)
-        document.getElementById('narrate-btn').onclick = () => {
-            const tasksText = appState.tasks[activeDay][activeTime].map(t => t.text).join('. ');
-            console.log(`Simulando narración de las tareas: ${tasksText}`);
-            const messageBox = document.createElement('div');
-            messageBox.innerHTML = `
-                <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                    <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm mx-auto text-center">
-                        <p class="text-xl font-bold mb-4">¡Reproduciendo audio!</p>
-                        <p class="text-gray-600">Simulando la narración de las tareas.</p>
-                        <button onclick="this.closest('.fixed').remove()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-full">Cerrar</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(messageBox);
-        };
-        
-        // Función para cambiar la visibilidad de las herramientas de cuidador
-        document.getElementById('toggle-caregiver-tools').onclick = () => {
-            document.querySelectorAll('.caregiver-tool').forEach(el => el.classList.toggle('hidden'));
-        };
-
-        // Rellenar las opciones de avatares
-        avatars.forEach(avatar => {
-            const option = document.createElement('option');
-            option.value = avatar;
-            option.textContent = avatar;
-            childAvatarSelect.appendChild(option);
-        });
-        
-        // Inicializar la vista
-        window.onload = () => {
-             showView('home-view');
-        };
-        
-        // Asegúrate de que los IDs existan
-        window.addEventListener('load', () => {
-            if (document.getElementById('app-container')) {
-                renderUI();
-            }
-        });
-
-    </script>
 </head>
-<body class="p-4 sm:p-8">
-    <div id="app-container" class="max-w-xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-100 p-6">
-        
-        <!-- Header del Sitio -->
-        <header class="text-center mb-6">
-            <h1 id="welcome-message" class="text-4xl font-bold text-pink-600">¡Hola, Pequeño Héroe!</h1>
-            <p class="text-gray-500 font-medium">¡Vamos a conquistar el día!</p>
-        </header>
+<body class="transition-colors duration-500">
 
-        <!-- Navegación Principal -->
-        <nav class="flex justify-around bg-gray-100 rounded-full p-2 mb-6 shadow-inner">
-            <button id="nav-home" class="px-6 py-3 rounded-full font-bold text-gray-700 hover:bg-white transition-colors duration-300">Mis Tareas</button>
-            <button id="nav-rewards" class="px-6 py-3 rounded-full font-bold text-gray-700 hover:bg-white transition-colors duration-300">Recompensas</button>
-            <button id="nav-settings" class="px-6 py-3 rounded-full font-bold text-gray-700 hover:bg-white transition-colors duration-300">Configuración</button>
-        </nav>
-        
-        <!-- Vista de Tareas (Principal) -->
-        <div id="home-view" class="hidden">
-            
-            <!-- Selector de Día y Franja Horaria -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                <div id="day-selectors" class="flex flex-wrap gap-2 justify-center"></div>
-                <div id="time-selectors" class="flex flex-wrap gap-2 justify-center"></div>
-            </div>
-
-            <div class="text-center font-bold text-xl text-gray-600 mb-4">
-                <span id="active-day" class="text-orange-600"></span>, <span id="active-time" class="text-pink-600"></span>
-            </div>
-            
-            <div id="printable-content">
-                <div id="tasks-container">
-                    <!-- Las tareas se renderizarán aquí -->
-                </div>
-            </div>
-
-            <!-- Barra de Progreso -->
-            <div class="mt-8">
-                <div class="text-center text-gray-600 font-semibold mb-2">Progreso Diario</div>
-                <div id="progress-bar" class="w-full h-8 rounded-full bg-gray-200">
-                    <div id="progress-bar-fill" class="h-full rounded-full bg-green-500 transition-all duration-500" style="width: 0%;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Vista de Recompensas -->
-        <div id="rewards-view" class="hidden">
-            <h2 class="text-2xl font-bold text-gray-700 mb-4">Mis Recompensas</h2>
-            <div id="rewards-container" class="grid grid-cols-3 gap-4">
-                <!-- Las recompensas se renderizarán aquí -->
-            </div>
-        </div>
-
-        <!-- Vista de Configuración del Cuidador -->
-        <div id="settings-view" class="hidden">
-            <h2 class="text-2xl font-bold text-gray-700 mb-4">Configuración del Cuidador</h2>
-            <p class="text-sm text-gray-500 mb-4" id="current-user-id"></p>
-            
-            <!-- Sección de Personalización -->
-            <form id="add-child-form" class="bg-gray-50 p-4 rounded-xl shadow-inner mb-6">
-                <h3 class="font-bold text-xl text-gray-700 mb-2">Personalizar</h3>
-                <div class="mb-4">
-                    <label for="child-name-input" class="block font-medium text-gray-600 mb-1">Nombre del Niño/a</label>
-                    <input type="text" id="child-name-input" placeholder="Ej: Sofía" class="w-full p-2 border border-gray-300 rounded-lg">
-                </div>
-                <div class="mb-4">
-                    <label for="child-avatar-select" class="block font-medium text-gray-600 mb-1">Elegir Avatar</label>
-                    <select id="child-avatar-select" class="w-full p-2 border border-gray-300 rounded-lg"></select>
-                </div>
-                <button type="button" id="save-settings-btn" class="w-full bg-blue-500 text-white font-bold py-2 rounded-lg hover:bg-blue-600 transition-colors">Guardar Cambios</button>
-            </form>
-            
-            <!-- Sección de Tareas -->
-            <div class="bg-gray-50 p-4 rounded-xl shadow-inner mb-6">
-                <h3 class="font-bold text-xl text-gray-700 mb-2">Gestión de Tareas</h3>
-                <form id="add-task-form" class="flex items-center space-x-2">
-                    <input type="text" id="add-task-input" placeholder="Añadir una nueva tarea" class="flex-1 p-2 border border-gray-300 rounded-lg">
-                    <button type="submit" id="add-task-btn" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-colors">Añadir</button>
-                </form>
-            </div>
-            
-            <!-- Funciones Extra -->
-            <div class="bg-gray-50 p-4 rounded-xl shadow-inner">
-                <h3 class="font-bold text-xl text-gray-700 mb-2">Herramientas Extra</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-2 gap-4">
-                    <button id="print-btn" class="bg-purple-500 text-white font-bold py-2 rounded-lg hover:bg-purple-600 transition-colors caregiver-tool hidden">Imprimir Rutina</button>
-                    <button id="narrate-btn" class="bg-yellow-500 text-white font-bold py-2 rounded-lg hover:bg-yellow-600 transition-colors">Narrar Tareas</button>
-                    <button id="night-mode-toggle" class="bg-gray-700 text-white font-bold py-2 rounded-lg hover:bg-gray-800 transition-colors">Modo Noche</button>
-                    <button id="toggle-caregiver-tools" class="bg-red-500 text-white font-bold py-2 rounded-lg hover:bg-red-600 transition-colors">Modo Cuidador</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="confetti-container" class="confetti-container"></div>
+    <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
+        <!-- El contenido de la aplicación se renderizará aquí -->
     </div>
+
+    <!-- Modal para Configuración Inicial -->
+    <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="clay-card p-6 md:p-8 w-full max-w-md text-center">
+            <h2 class="text-2xl md:text-3xl font-bold text-amber-600 mb-4">¡Bienvenido/a!</h2>
+            <p class="text-gray-500 mb-6">Vamos a configurar tu rutina divertida.</p>
+            
+            <div class="mb-4">
+                <label for="child-name" class="block text-left font-bold mb-2">Nombre del niño/a:</label>
+                <input type="text" id="child-name" placeholder="Ej: Leo" class="w-full p-3 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-400 focus:outline-none">
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-left font-bold mb-2">Elige un avatar:</label>
+                <div id="avatar-selection" class="flex justify-center space-x-4">
+                    <!-- Avatares se insertarán aquí -->
+                </div>
+            </div>
+
+            <button id="start-button" class="clay-button bg-amber-400 text-white font-bold py-3 px-8 text-lg rounded-lg w-full">¡Empezar a Jugar!</button>
+        </div>
+    </div>
+    
+    <!-- Modal para Recompensas -->
+    <div id="rewards-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50 no-print">
+        <div class="clay-card p-6 md:p-8 w-full max-w-lg text-center relative">
+            <button id="close-rewards-button" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 class="text-2xl md:text-3xl font-bold text-amber-600 mb-2">¡Mis Recompensas!</h2>
+            <p class="text-gray-500 mb-6">Has ganado estas medallas y stickers por tu gran trabajo.</p>
+            <div id="rewards-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-4 max-h-80 overflow-y-auto p-4 bg-amber-50 rounded-lg">
+                <!-- Recompensas desbloqueadas aquí -->
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = document.getElementById('app');
+            const setupModal = document.getElementById('setup-modal');
+            const rewardsModal = document.getElementById('rewards-modal');
+            const startButton = document.getElementById('start-button');
+            const childNameInput = document.getElementById('child-name');
+            const avatarSelection = document.getElementById('avatar-selection');
+            
+            const synth = window.speechSynthesis;
+            const sound = new Tone.Synth({
+                oscillator: { type: 'sine' },
+                envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 }
+            }).toDestination();
+
+            const avatars = {
+                bunny: { name: 'Conejito', emoji: '🐰' },
+                bear: { name: 'Osito', emoji: '🐻' },
+                monster: { name: 'Monstruito', emoji: '👾' },
+                dino: { name: 'Dinosaurio', emoji: '🦖' },
+            };
+            
+            const rewards = [
+                { id: 'star', emoji: '🌟', name: 'Primera Tarea', needed: 1 },
+                { id: 'thumbsup', emoji: '👍', name: 'Buen Comienzo', needed: 5 },
+                { id: 'medal', emoji: '🏅', name: 'Día Completo', needed: 10 },
+                { id: 'rocket', emoji: '🚀', name: 'Súper Rápido', needed: 15 },
+                { id: 'trophy', emoji: '🏆', name: 'Semana Genial', needed: 25 },
+                { id: 'gem', emoji: '💎', name: 'Imparable', needed: 50 },
+                { id: 'crown', emoji: '👑', name: 'Rey/Reina de la Rutina', needed: 100 },
+                 { id: 'heart', emoji: '💖', name: 'Corazón de oro', needed: 125 },
+                { id: 'confetti', emoji: '🎉', name: 'Fiesta de tareas', needed: 150 },
+            ];
+
+            let state = {
+                childName: '',
+                avatar: 'bunny',
+                currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' }).replace(/^\w/, c => c.toUpperCase()),
+                darkMode: false,
+                tasks: {},
+                completedCount: 0
+            };
+            
+            const defaultTasks = {
+                AM: [
+                    { text: 'Despertar y estirarse', icon: '☀️', done: false },
+                    { text: 'Ir al baño', icon: '🚽', done: false },
+                    { text: 'Lavarse la cara y los dientes', icon: '🦷', done: false },
+                    { text: 'Vestirse', icon: '👕', done: false },
+                    { text: 'Desayunar', icon: '🥣', done: false },
+                ],
+                PM: [
+                    { text: 'Comer', icon: '🥗', done: false },
+                    { text: 'Jugar un rato', icon: '🧸', done: false },
+                    { text: 'Hacer las tareas escolares', icon: '📚', done: false },
+                    { text: 'Ordenar los juguetes', icon: '📦', done: false },
+                ],
+                Noche: [
+                    { text: 'Cenar en familia', icon: '🍽️', done: false },
+                    { text: 'Ponerse el pijama', icon: '🌙', done: false },
+                    { text: 'Lavarse los dientes', icon: '🦷', done: false },
+                    { text: 'Leer un cuento', icon: '📖', done: false },
+                    { text: 'A la cama a descansar', icon: '😴', done: false },
+                ]
+            };
+            
+            const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+            // --- INICIALIZACIÓN ---
+            
+            function initialize() {
+                loadState();
+                renderAvatars();
+                if (state.childName) {
+                    setupModal.style.display = 'none';
+                    renderApp();
+                }
+
+                startButton.addEventListener('click', () => {
+                    const name = childNameInput.value.trim();
+                    if (name === '') {
+                        alert('Por favor, ingresa un nombre.');
+                        return;
+                    }
+                    state.childName = name;
+                    const selectedAvatar = document.querySelector('input[name="avatar"]:checked');
+                    if(selectedAvatar) state.avatar = selectedAvatar.value;
+                    
+                    initializeTasksForWeek();
+                    saveState();
+                    setupModal.style.display = 'none';
+                    renderApp();
+                });
+            }
+
+            function initializeTasksForWeek() {
+                if (Object.keys(state.tasks).length > 0) return;
+                daysOfWeek.forEach(day => {
+                    state.tasks[day] = JSON.parse(JSON.stringify(defaultTasks));
+                });
+            }
+
+            // --- LÓGICA DE ESTADO ---
+
+            function saveState() {
+                localStorage.setItem('miRutinaDivertida', JSON.stringify(state));
+            }
+
+            function loadState() {
+                const savedState = localStorage.getItem('miRutinaDivertida');
+                if (savedState) {
+                    state = JSON.parse(savedState);
+                    if(state.darkMode) document.body.classList.add('dark-mode');
+                }
+            }
+
+            // --- RENDERIZADO ---
+
+            function renderApp() {
+                const dayTasks = state.tasks[state.currentDay] || JSON.parse(JSON.stringify(defaultTasks));
+                const totalTasks = dayTasks.AM.length + dayTasks.PM.length + dayTasks.Noche.length;
+                const completedTasks = dayTasks.AM.filter(t => t.done).length + dayTasks.PM.filter(t => t.done).length + dayTasks.Noche.filter(t => t.done).length;
+                const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+                app.innerHTML = `
+                    <!-- Header -->
+                    <header class="clay-card p-4 mb-6 text-center no-print">
+                         <div class="flex justify-between items-center mb-4">
+                            <button id="rewards-button" class="text-3xl hover:transform hover:scale-110 transition-transform">🏅</button>
+                            <div class="text-center">
+                                <div class="text-5xl">${avatars[state.avatar].emoji}</div>
+                                <h1 class="text-2xl font-bold text-gray-800">Hola, ${state.childName}!</h1>
+                            </div>
+                            <div class="flex flex-col items-center space-y-2">
+                                <button id="toggle-dark-mode" class="text-2xl hover:transform hover:scale-110 transition-transform">${state.darkMode ? '☀️' : '🌙'}</button>
+                                <button id="print-button" class="text-2xl hover:transform hover:scale-110 transition-transform">🖨️</button>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 mb-2">Tu progreso de hoy:</p>
+                        <div class="w-full bg-gray-200 rounded-full h-4">
+                            <div class="bg-gradient-to-r from-yellow-400 to-amber-500 h-4 rounded-full progress-bar-fill" style="width: ${progress}%"></div>
+                        </div>
+                    </header>
+
+                    <!-- Selector de Día -->
+                    <div class="flex space-x-2 overflow-x-auto pb-4 mb-6 no-print">
+                        ${daysOfWeek.map(day => `
+                            <button class="day-selector clay-button text-sm sm:text-base font-bold py-2 px-4 whitespace-nowrap ${state.currentDay === day ? 'bg-amber-400 text-white' : 'bg-white'}" data-day="${day}">
+                                ${day}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="print-header hidden">
+                        <h1 class="text-3xl font-bold">Rutina de ${state.childName}</h1>
+                        <h2 class="text-2xl text-gray-600">${state.currentDay}</h2>
+                    </div>
+
+                    <!-- Listas de Tareas -->
+                    <main class="grid md:grid-cols-3 gap-6">
+                        ${renderTaskList('AM', 'Mañana', dayTasks.AM, 'bg-amber-100')}
+                        ${renderTaskList('PM', 'Tarde', dayTasks.PM, 'bg-sky-100')}
+                        ${renderTaskList('Noche', 'Noche', dayTasks.Noche, 'bg-indigo-100')}
+                    </main>
+                `;
+                addEventListeners();
+            }
+            
+            function renderAvatars() {
+                avatarSelection.innerHTML = Object.keys(avatars).map((key, index) => `
+                    <div class="text-center">
+                        <input type="radio" id="avatar-${key}" name="avatar" value="${key}" class="hidden" ${index === 0 ? 'checked' : ''}>
+                        <label for="avatar-${key}" class="cursor-pointer p-3 rounded-full border-4 border-transparent text-5xl transition-all duration-200 hover:bg-amber-100">
+                            ${avatars[key].emoji}
+                        </label>
+                        <p class="text-sm font-bold">${avatars[key].name}</p>
+                    </div>
+                `).join('');
+                
+                // Estilo para el avatar seleccionado
+                document.querySelectorAll('input[name="avatar"]').forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        document.querySelectorAll('label[for^="avatar-"]').forEach(label => {
+                           label.style.borderColor = 'transparent';
+                           label.style.backgroundColor = 'transparent';
+                        });
+                        if(radio.checked) {
+                            const label = document.querySelector(`label[for="${radio.id}"]`);
+                            label.style.borderColor = '#FBBF24'; // amber-400
+                            label.style.backgroundColor = '#FEF3C7'; // amber-100
+                        }
+                    });
+                });
+                 // Aplicar estilo inicial
+                document.querySelector('input[name="avatar"]:checked+label').style.borderColor = '#FBBF24';
+                document.querySelector('input[name="avatar"]:checked+label').style.backgroundColor = '#FEF3C7';
+            }
+
+            function renderTaskList(period, title, tasks, bgColor) {
+                return `
+                    <div class="clay-card p-4">
+                        <h2 class="text-xl font-extrabold text-center mb-4 ${bgColor} rounded-lg py-2">${title}</h2>
+                        <ul class="space-y-3">
+                            ${tasks.map((task, index) => renderTaskItem(task, period, index)).join('')}
+                        </ul>
+                         <div class="mt-4">
+                            <input type="text" id="new-task-${period}" class="w-full p-2 border-2 border-gray-200 rounded-lg" placeholder="Nueva tarea...">
+                            <button class="add-task-btn clay-button bg-green-400 text-white w-full mt-2 py-2 font-bold" data-period="${period}">Añadir Tarea</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderTaskItem(task, period, index) {
+                return `
+                    <li class="task-item flex items-center bg-white p-2 rounded-lg shadow-inner transition-all duration-300 ${task.done ? 'opacity-60' : ''}">
+                        <input type="checkbox" id="task-${period}-${index}" class="hidden task-checkbox" ${task.done ? 'checked' : ''} data-period="${period}" data-index="${index}">
+                        <label for="task-${period}-${index}" class="flex items-center grow cursor-pointer">
+                           <span class="text-3xl mr-3">${task.icon}</span>
+                            <span class="grow text-gray-700 font-semibold" contenteditable="true" data-period="${period}" data-index="${index}">${task.text}</span>
+                            <div class="flex-none w-8 h-8 mr-2 flex items-center justify-center">
+                                <svg class="icon-unchecked w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <svg class="icon-checked hidden w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                        </label>
+                        <button class="speak-btn text-gray-400 hover:text-blue-500 text-xl" data-text="${task.icon} ${task.text}">🔊</button>
+                        <button class="delete-btn text-gray-400 hover:text-red-500 text-xl ml-1" data-period="${period}" data-index="${index}">🗑️</button>
+                    </li>
+                `;
+            }
+
+            function renderRewards() {
+                const unlocked = rewards.filter(r => state.completedCount >= r.needed);
+                const rewardsGrid = document.getElementById('rewards-grid');
+                if (unlocked.length === 0) {
+                     rewardsGrid.innerHTML = `<p class="col-span-full text-gray-500">¡Sigue completando tareas para ganar recompensas!</p>`;
+                } else {
+                    rewardsGrid.innerHTML = unlocked.map(reward => `
+                        <div class="flex flex-col items-center justify-center p-2 bg-white rounded-lg shadow-inner">
+                            <span class="text-5xl">${reward.emoji}</span>
+                            <span class="text-xs font-bold text-center mt-1">${reward.name}</span>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            // --- MANEJADORES DE EVENTOS ---
+            function addEventListeners() {
+                // Selector de Día
+                document.querySelectorAll('.day-selector').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        state.currentDay = e.target.dataset.day;
+                        renderApp();
+                    });
+                });
+                
+                // Checkbox de Tarea
+                document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const { period, index } = e.target.dataset;
+                        handleTaskCheck(period, parseInt(index), e.target.checked);
+                    });
+                });
+
+                // Añadir Tarea
+                document.querySelectorAll('.add-task-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const period = e.target.dataset.period;
+                        const input = document.getElementById(`new-task-${period}`);
+                        const text = input.value.trim();
+                        if (text) {
+                            state.tasks[state.currentDay][period].push({ text, icon: '✏️', done: false });
+                            input.value = '';
+                            saveAndRerender();
+                        }
+                    });
+                });
+                
+                // Editar Tarea
+                document.querySelectorAll('[contenteditable="true"]').forEach(span => {
+                    span.addEventListener('blur', (e) => {
+                        const { period, index } = e.target.dataset;
+                        const newText = e.target.innerText;
+                        state.tasks[state.currentDay][period][parseInt(index)].text = newText;
+                        saveState();
+                    });
+                     span.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            e.target.blur();
+                        }
+                    });
+                });
+
+                // Borrar Tarea
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', e => {
+                        const {period, index} = e.currentTarget.dataset;
+                        state.tasks[state.currentDay][period].splice(parseInt(index), 1);
+                        saveAndRerender();
+                    })
+                });
+
+                // Leer en voz alta
+                document.querySelectorAll('.speak-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                         const textToSpeak = e.currentTarget.dataset.text;
+                         const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                         utterance.lang = 'es-ES';
+                         synth.speak(utterance);
+                    });
+                });
+
+                // Abrir modal de recompensas
+                document.getElementById('rewards-button').addEventListener('click', () => {
+                    renderRewards();
+                    rewardsModal.style.display = 'flex';
+                });
+                
+                // Cerrar modal de recompensas
+                document.getElementById('close-rewards-button').addEventListener('click', () => {
+                     rewardsModal.style.display = 'none';
+                });
+
+                // Modo oscuro
+                document.getElementById('toggle-dark-mode').addEventListener('click', () => {
+                    state.darkMode = !state.darkMode;
+                    document.body.classList.toggle('dark-mode');
+                    saveAndRerender();
+                });
+
+                // Imprimir
+                document.getElementById('print-button').addEventListener('click', () => {
+                    window.print();
+                });
+            }
+
+            function handleTaskCheck(period, index, isDone) {
+                const previouslyDone = state.tasks[state.currentDay][period][index].done;
+                state.tasks[state.currentDay][period][index].done = isDone;
+
+                // Solo celebrar y contar si la tarea se está marcando como hecha
+                if (isDone && !previouslyDone) {
+                    state.completedCount++;
+                    // Efectos visuales y sonoros
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                    sound.triggerAttackRelease('C4', '8n');
+                    
+                    // Comprobar si se desbloqueó una nueva recompensa
+                    const newlyUnlocked = rewards.find(r => r.needed === state.completedCount);
+                    if (newlyUnlocked) {
+                         setTimeout(() => {
+                            alert(`¡Felicidades! Has ganado la recompensa: ${newlyUnlocked.emoji} ${newlyUnlocked.name}`);
+                        }, 500);
+                    }
+                } else if (!isDone && previouslyDone) {
+                    // Si se desmarca, restar del contador
+                    state.completedCount = Math.max(0, state.completedCount - 1);
+                }
+
+                saveAndRerender();
+            }
+
+            function saveAndRerender() {
+                saveState();
+                renderApp();
+            }
+
+            // Iniciar la aplicación
+            initialize();
+        });
+    </script>
 </body>
 </html>
