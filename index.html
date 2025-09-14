@@ -68,6 +68,23 @@
         .dark-mode .bg-sky-100 { background-color: #4A5568; }
         .dark-mode .bg-indigo-100 { background-color: #4A5568; }
         
+        .input-error {
+            border-color: #EF4444 !important; /* red-500 */
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .error-message {
+            color: #EF4444;
+            font-size: 0.875rem;
+            min-height: 1.25rem; /* Evita que el layout salte */
+        }
+
         /* Ocultar en impresión */
         @media print {
             .no-print {
@@ -105,7 +122,8 @@
             
             <div class="mb-4">
                 <label for="child-name" class="block text-left font-bold mb-2">Nombre del niño/a:</label>
-                <input type="text" id="child-name" placeholder="Ej: Leo" class="w-full p-3 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-400 focus:outline-none">
+                <input type="text" id="child-name" placeholder="Ej: Leo" class="w-full p-3 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-400 focus:outline-none transition-colors">
+                <p id="name-error" class="error-message text-left mt-1"></p>
             </div>
 
             <div class="mb-6">
@@ -131,6 +149,11 @@
                 <!-- Recompensas desbloqueadas aquí -->
             </div>
         </div>
+    </div>
+
+    <!-- Notificación Toast para Recompensas -->
+    <div id="notification-modal" class="fixed top-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg transform translate-x-[calc(100%+1.25rem)] transition-transform duration-500 z-50 no-print">
+        <p id="notification-text" class="font-bold"></p>
     </div>
 
 
@@ -214,10 +237,19 @@
 
                 startButton.addEventListener('click', () => {
                     const name = childNameInput.value.trim();
+                    const nameError = document.getElementById('name-error');
+
+                    childNameInput.classList.remove('input-error');
+                    nameError.textContent = '';
+                    
                     if (name === '') {
-                        alert('Por favor, ingresa un nombre.');
+                        // Se reemplaza alert() por feedback visual no bloqueante, ideal para iframes.
+                        childNameInput.classList.add('input-error');
+                        nameError.textContent = 'Por favor, ingresa un nombre.';
+                        childNameInput.focus();
                         return;
                     }
+
                     state.childName = name;
                     const selectedAvatar = document.querySelector('input[name="avatar"]:checked');
                     if(selectedAvatar) state.avatar = selectedAvatar.value;
@@ -489,9 +521,7 @@
                     // Comprobar si se desbloqueó una nueva recompensa
                     const newlyUnlocked = rewards.find(r => r.needed === state.completedCount);
                     if (newlyUnlocked) {
-                         setTimeout(() => {
-                            alert(`¡Felicidades! Has ganado la recompensa: ${newlyUnlocked.emoji} ${newlyUnlocked.name}`);
-                        }, 500);
+                         showNotification(`¡Nueva recompensa! ${newlyUnlocked.emoji} ${newlyUnlocked.name}`);
                     }
                 } else if (!isDone && previouslyDone) {
                     // Si se desmarca, restar del contador
@@ -499,6 +529,19 @@
                 }
 
                 saveAndRerender();
+            }
+
+            function showNotification(message) {
+                const notificationModal = document.getElementById('notification-modal');
+                const notificationText = document.getElementById('notification-text');
+                if (!notificationModal || !notificationText) return;
+
+                notificationText.innerHTML = message;
+                notificationModal.style.transform = 'translateX(0)';
+
+                setTimeout(() => {
+                    notificationModal.style.transform = 'translateX(calc(100% + 1.25rem))';
+                }, 4000); // Ocultar después de 4 segundos
             }
 
             function saveAndRerender() {
@@ -512,3 +555,4 @@
     </script>
 </body>
 </html>
+
