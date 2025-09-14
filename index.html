@@ -167,10 +167,22 @@
             const avatarSelection = document.getElementById('avatar-selection');
             
             const synth = window.speechSynthesis;
-            const sound = new Tone.Synth({
-                oscillator: { type: 'sine' },
-                envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 }
-            }).toDestination();
+            let sound;
+
+            try {
+                // Se envuelve la inicialización de Tone.js en un try-catch.
+                // Si la librería no carga por problemas de red, la app no se romperá.
+                sound = new Tone.Synth({
+                    oscillator: { type: 'sine' },
+                    envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 }
+                }).toDestination();
+            } catch (e) {
+                console.error("Tone.js no se pudo cargar. Las funciones de sonido estarán desactivadas.", e);
+                // Se crea un objeto 'sound' falso para que las llamadas posteriores no fallen.
+                sound = {
+                    triggerAttackRelease: () => {}
+                };
+            }
 
             const avatars = {
                 bunny: { name: 'Conejito', emoji: '🐰' },
@@ -243,7 +255,6 @@
                     nameError.textContent = '';
                     
                     if (name === '') {
-                        // Se reemplaza alert() por feedback visual no bloqueante, ideal para iframes.
                         childNameInput.classList.add('input-error');
                         nameError.textContent = 'Por favor, ingresa un nombre.';
                         childNameInput.focus();
