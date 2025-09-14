@@ -3,565 +3,910 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Rutina Divertida</title>
+    <title>Rutinas Mágicas - To-Do List Infantil</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* Estilos mejorados y tema "Cálido y Juguetón" */
         body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #FFFBF0;
-            color: #4A4A4A;
+            font-family: 'Baloo 2', cursive;
+            background: linear-gradient(180deg, #FFFBF2 0%, #FFF5E1 100%);
+            color: #4A3F35; /* Marrón oscuro más cálido */
+            overscroll-behavior-y: contain;
         }
-        /* Estilo Claymorphism / Acuarela Suave */
-        .clay-card {
-            background-color: #FFFFFF;
-            border-radius: 20px;
-            box-shadow: 8px 8px 16px rgba(212, 192, 156, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
+
+        /* Tema Claro (Default) */
+        :root {
+            --bg-primary: #F8F4E8;
+            --bg-secondary: #FFFFFF;
+            --text-primary: #4A3F35;
+            --text-secondary: #9E8E7E;
+            --accent-1: #FF8A65; /* Coral vibrante */
+            --accent-2: #64B5F6; /* Azul cielo vibrante */
+            --accent-3: #81C784; /* Verde menta vibrante */
+            --accent-4: #FFD54F; /* Amarillo sol */
+            --button-bg: #FF8A65;
+            --button-text: #FFFFFF;
+            --shadow-color: rgba(74, 63, 53, 0.1);
+            --card-color: var(--accent-1); /* Color por defecto para la barra de la tarjeta */
         }
-        .clay-button {
-            border-radius: 12px;
-            box-shadow: 4px 4px 8px rgba(212, 192, 156, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8);
-            transition: all 0.2s ease-in-out;
+
+        /* Tema Oscuro ("Modo Noche") */
+        .dark {
+            --bg-primary: #37474F;
+            --bg-secondary: #455A64;
+            --text-primary: #ECEFF1;
+            --text-secondary: #B0BEC5;
+            --accent-1: #78909C;
+            --accent-2: #78909C;
+            --accent-3: #A5D6A7; /* Un verde más brillante para contraste */
+            --accent-4: #FFE082; /* Amarillo para contraste */
+            --button-bg: #546E7A;
+            --button-text: #ECEFF1;
+            --shadow-color: rgba(0, 0, 0, 0.2);
         }
-        .clay-button:active {
-            box-shadow: inset 4px 4px 8px rgba(212, 192, 156, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
-            transform: translateY(2px);
-        }
-        .task-checkbox:checked + label {
-            text-decoration: line-through;
-            color: #9CA3AF;
-        }
-        .task-checkbox:checked + label svg.icon-unchecked {
-            display: none;
-        }
-        .task-checkbox:checked + label svg.icon-checked {
-            display: inline-block;
-        }
-        .progress-bar-fill {
-            transition: width 0.5s ease-in-out;
-        }
-        /* Modo Noche */
-        .dark-mode {
-            background-color: #1A202C;
-            color: #E2E8F0;
-        }
-        .dark-mode .clay-card {
-            background-color: #2D3748;
-            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3), -8px -8px 16px rgba(74, 85, 104, 0.2);
-        }
-        .dark-mode .clay-button {
-            background-color: #4A5568;
-            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3), -4px -4px 8px rgba(74, 85, 104, 0.2);
-        }
-        .dark-mode .clay-button:active {
-             box-shadow: inset 4px 4px 8px rgba(0,0,0, 0.3), inset -4px -4px 8px rgba(74, 85, 104, 0.2);
-        }
-        .dark-mode .text-gray-800 { color: #E2E8F0; }
-        .dark-mode .text-gray-500 { color: #A0AEC0; }
-        .dark-mode .text-amber-600 { color: #F6E05E; }
-        .dark-mode .bg-amber-100 { background-color: #4A5568; }
-        .dark-mode .bg-sky-100 { background-color: #4A5568; }
-        .dark-mode .bg-indigo-100 { background-color: #4A5568; }
         
-        .input-error {
-            border-color: #EF4444 !important; /* red-500 */
-            animation: shake 0.5s;
+        body.dark {
+            background: #263238;
+            color: var(--text-primary);
+        }
+        
+        .task-card {
+            background-color: var(--bg-secondary);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px var(--shadow-color);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            padding-top: 1.5rem; /* Espacio para la barra de color */
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background-color: var(--card-color);
+            transition: background-color 0.3s ease;
         }
 
-        .error-message {
-            color: #EF4444;
-            font-size: 0.875rem;
-            min-height: 1.25rem; /* Evita que el layout salte */
+        .task-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 30px -10px var(--shadow-color);
         }
 
-        /* Ocultar en impresión */
+        .task-checkbox {
+            width: 2.8rem;
+            height: 2.8rem;
+            border-radius: 50%;
+            border: 3px solid var(--text-secondary);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-item-wrapper.completed .task-checkbox {
+            background-color: var(--accent-3);
+            border-color: var(--accent-3);
+            transform: scale(1.1);
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1.1); }
+        }
+        
+        .task-item-wrapper.completed .task-checkbox {
+            animation: pop 0.4s ease-out;
+        }
+
+        .task-item-wrapper.completed .task-checkbox i {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+        
+        .task-item-wrapper.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+            text-decoration-thickness: 2px;
+        }
+        
+        .task-checkbox i {
+            color: white;
+            font-size: 1.6rem;
+            opacity: 0;
+            transform: scale(0.3) rotate(-180deg);
+            transition: all 0.3s ease-out;
+        }
+
+        .progress-bar-bg {
+            background-color: rgba(0,0,0,0.05);
+            border-radius: 9999px;
+            overflow: hidden;
+            height: 24px;
+            padding: 4px;
+        }
+
+        .progress-bar-fill {
+            background-image: linear-gradient(90deg, var(--accent-3), var(--accent-4));
+            transition: width 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 9999px;
+        }
+        
+        .nav-button {
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+        .nav-button.active {
+            color: var(--button-bg);
+            transform: scale(1.15) translateY(-5px);
+        }
+        
+        /* Animación de confeti */
+        .confetti-piece {
+            position: absolute;
+            width: 8px;
+            height: 16px;
+            opacity: 0;
+        }
+        
+        /* Modal más suave */
+        .modal-content {
+            background-color: var(--bg-secondary);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .day-selector-btn, .avatar-selector, button {
+             transition: transform 0.1s ease;
+        }
+        .day-selector-btn:active, .avatar-selector:active, button:active {
+            transform: scale(0.95);
+        }
+        
+        .icon-selector-btn.selected {
+            background-color: var(--accent-2);
+            color: white;
+            border-color: var(--accent-2);
+        }
+
+        /* Estilos para arrastrar y soltar */
+        .drag-handle {
+            cursor: grab;
+        }
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #c8ebfb;
+            border-radius: 10px;
+        }
+        .sortable-chosen {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+
+        /* Estilo para impresión */
         @media print {
-            .no-print {
-                display: none;
-            }
-            body {
-                background-color: #FFFFFF;
-            }
-            .clay-card {
-                box-shadow: none;
-                border: 1px solid #ddd;
-            }
-            .print-header {
-                display: block !important;
-                text-align: center;
-                margin-bottom: 2rem;
-            }
-            .task-item {
-                page-break-inside: avoid;
-            }
+            body, body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none; }
         }
     </style>
 </head>
-<body class="transition-colors duration-500">
+<body class="transition-colors duration-300">
 
-    <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
-        <!-- El contenido de la aplicación se renderizará aquí -->
-    </div>
+    <div id="app-container" class="max-w-md mx-auto min-h-screen flex flex-col pt-4 pb-24 relative overflow-x-hidden">
 
-    <!-- Modal para Configuración Inicial -->
-    <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="clay-card p-6 md:p-8 w-full max-w-md text-center">
-            <h2 class="text-2xl md:text-3xl font-bold text-amber-600 mb-4">¡Bienvenido/a!</h2>
-            <p class="text-gray-500 mb-6">Vamos a configurar tu rutina divertida.</p>
-            
-            <div class="mb-4">
-                <label for="child-name" class="block text-left font-bold mb-2">Nombre del niño/a:</label>
-                <input type="text" id="child-name" placeholder="Ej: Leo" class="w-full p-3 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-400 focus:outline-none transition-colors">
-                <p id="name-error" class="error-message text-left mt-1"></p>
+        <!-- Encabezado con perfil del niño -->
+        <header class="flex items-center justify-between px-4 pb-4 mb-4 border-b-2 border-[#F0EAD6]">
+            <div class="flex items-center gap-4">
+                <div id="avatar-display" class="w-16 h-16 text-5xl flex items-center justify-center rounded-full bg-white shadow-lg">🐰</div>
+                <h1 class="text-3xl font-bold text-[var(--text-primary)]">Hola, <span id="child-name-display" class="text-[var(--button-bg)]">Peque</span>!</h1>
             </div>
+            <button onclick="showView('settings')" class="text-3xl text-gray-400 hover:text-[var(--button-bg)] transition-colors">
+                <i class="fas fa-cog fa-spin-hover"></i>
+            </button>
+        </header>
 
-            <div class="mb-6">
-                <label class="block text-left font-bold mb-2">Elige un avatar:</label>
-                <div id="avatar-selection" class="flex justify-center space-x-4">
-                    <!-- Avatares se insertarán aquí -->
+        <!-- Contenido principal (vistas intercambiables) -->
+        <main class="flex-grow px-4">
+            <!-- Vista de Tareas (Home) -->
+            <div id="tasks-view">
+                <!-- Barra de Progreso -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-md font-semibold">Tu progreso de hoy</span>
+                        <span id="progress-text" class="text-md font-bold text-[var(--accent-3)]">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar" class="progress-bar-fill h-full" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Selector de Día -->
+                <div class="flex justify-around items-center mb-6 p-2 bg-white/50 rounded-full no-print shadow-inner">
+                    <button onclick="changeDay(this, 'Lunes')" class="day-selector-btn active bg-[var(--button-bg)] text-[var(--button-text)] w-10 h-10 rounded-full font-bold text-lg shadow">L</button>
+                    <button onclick="changeDay(this, 'Martes')" class="day-selector-btn text-[var(--text-secondary)] w-10 h-10 rounded-full font-bold text-lg">M</button>
+                    <button onclick="changeDay(this, 'Miércoles')" class="day-selector-btn text-[var(--text-secondary)] w-10 h-10 rounded-full font-bold text-lg">X</button>
+                    <button onclick="changeDay(this, 'Jueves')" class="day-selector-btn text-[var(--text-secondary)] w-10 h-10 rounded-full font-bold text-lg">J</button>
+                    <button onclick="changeDay(this, 'Viernes')" class="day-selector-btn text-[var(--text-secondary)] w-10 h-10 rounded-full font-bold text-lg">V</button>
+                    <button onclick="changeDay(this, 'Sábado')" class="day-selector-btn text-[var(--text-secondary)] w-10 h-10 rounded-full font-bold text-lg">S</button>
+                    <button onclick="changeDay(this, 'Domingo')" class="day-selector-btn text-[var(--text-secondary)] w-10 h-10 rounded-full font-bold text-lg">D</button>
+                </div>
+                
+                <div id="print-area">
+                    <h2 id="current-day-title" class="text-4xl font-bold text-center mb-6 text-[var(--text-primary)]">Lunes</h2>
+                    <div id="task-list-container" class="space-y-6">
+                        <!-- Las listas de tareas se renderizarán aquí -->
+                    </div>
                 </div>
             </div>
 
-            <button id="start-button" class="clay-button bg-amber-400 text-white font-bold py-3 px-8 text-lg rounded-lg w-full">¡Empezar a Jugar!</button>
-        </div>
-    </div>
-    
-    <!-- Modal para Recompensas -->
-    <div id="rewards-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50 no-print">
-        <div class="clay-card p-6 md:p-8 w-full max-w-lg text-center relative">
-            <button id="close-rewards-button" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            <!-- Vista de Recompensas -->
+            <div id="rewards-view" class="hidden">
+                 <h2 class="text-4xl font-bold text-center mb-6 text-[var(--text-primary)]">Tus Recompensas</h2>
+                <div class="task-card p-4">
+                    <h3 class="text-2xl font-bold mb-4 text-[var(--accent-4)]">Stickers Ganados</h3>
+                    <div id="stickers-gallery" class="grid grid-cols-3 sm:grid-cols-4 gap-4 p-4 min-h-[150px]">
+                        <!-- Los stickers se renderizarán aquí -->
+                    </div>
+                     <p id="no-stickers-msg" class="text-center text-[var(--text-secondary)]">¡Completa tareas para ganar stickers!</p>
+                </div>
+            </div>
+
+            <!-- Vista de Biblioteca de Tareas -->
+            <div id="library-view" class="hidden">
+                <h2 class="text-4xl font-bold text-center mb-6 text-[var(--text-primary)]">Biblioteca de Tareas</h2>
+                
+                <div class="task-card p-4 mb-6">
+                    <h3 class="text-2xl font-bold mb-4">Crear una Tarea Nueva</h3>
+                    <div class="mt-2 space-y-4">
+                        <input id="new-task-text-input" class="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-[var(--button-bg)] outline-none bg-[var(--bg-primary)] text-lg" placeholder="Nombre de la tarea...">
+                        <div>
+                            <label class="font-semibold mb-2 block">Elige un ícono:</label>
+                            <div id="icon-selector-container" class="grid grid-cols-6 gap-2 text-2xl">
+                                <!-- Iconos para seleccionar se renderizarán aquí -->
+                            </div>
+                        </div>
+                        <button onclick="saveNewTaskTemplate()" class="w-full bg-[var(--button-bg)] text-[var(--button-text)] font-bold py-3 rounded-xl shadow-lg hover:opacity-90 transition">
+                            <i class="fas fa-plus-circle mr-2"></i>Guardar Tarea
+                        </button>
+                    </div>
+                </div>
+
+                <div id="custom-task-section">
+                    <h3 class="text-2xl font-bold mb-4">Tus Tareas Guardadas</h3>
+                    <div id="custom-task-list" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <!-- Tareas personalizadas aquí -->
+                    </div>
+                    <p id="no-custom-tasks-msg" class="text-center text-[var(--text-secondary)] hidden">Aún no has creado tareas.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-4 mt-6">Tareas Sugeridas</h3>
+                <div id="default-task-list" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <!-- Tareas por defecto aquí -->
+                </div>
+            </div>
+
+            <!-- Vista de Configuración -->
+            <div id="settings-view" class="hidden">
+                <h2 class="text-4xl font-bold text-center mb-6 text-[var(--text-primary)]">Configuración</h2>
+                <div class="space-y-6">
+                    <!-- Perfil del Niño -->
+                    <div class="task-card p-4">
+                        <h3 class="text-2xl font-bold mb-4">Perfil del Niño/a</h3>
+                        <label class="block mb-2 font-semibold">Nombre:</label>
+                        <input id="child-name-input" type="text" class="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-[var(--button-bg)] outline-none bg-[var(--bg-primary)] text-lg" placeholder="Nombre de tu peque">
+                        
+                        <label class="block mt-4 mb-2 font-semibold">Elige un Avatar:</label>
+                        <div class="grid grid-cols-4 gap-4 text-4xl">
+                            <button onclick="selectAvatar(this, '🐰')" class="avatar-selector p-2 rounded-full bg-orange-200 border-2 border-orange-400">🐰</button>
+                            <button onclick="selectAvatar(this, '🐻')" class="avatar-selector p-2 rounded-full">🐻</button>
+                            <button onclick="selectAvatar(this, '🦊')" class="avatar-selector p-2 rounded-full">🦊</button>
+                            <button onclick="selectAvatar(this, '🐼')" class="avatar-selector p-2 rounded-full">🐼</button>
+                            <button onclick="selectAvatar(this, '🐸')" class="avatar-selector p-2 rounded-full">🐸</button>
+                            <button onclick="selectAvatar(this, '🐵')" class="avatar-selector p-2 rounded-full">🐵</button>
+                             <button onclick="selectAvatar(this, '🦄')" class="avatar-selector p-2 rounded-full">🦄</button>
+                             <button onclick="selectAvatar(this, '🤖')" class="avatar-selector p-2 rounded-full">🤖</button>
+                        </div>
+                    </div>
+
+                    <!-- Ajustes Generales -->
+                    <div class="task-card p-4">
+                        <h3 class="text-2xl font-bold mb-4">Ajustes Generales</h3>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold">Modo Noche</span>
+                            <button onclick="toggleNightMode(this)" class="w-14 h-8 flex items-center bg-gray-300 rounded-full p-1 duration-300 ease-in-out">
+                                <div class="bg-white w-6 h-6 rounded-full shadow-md transform duration-300 ease-in-out"></div>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="font-semibold">Sonidos de recompensa</span>
+                             <button onclick="toggleSound(this)" class="w-14 h-8 flex items-center bg-[var(--accent-3)] rounded-full p-1 duration-300 ease-in-out">
+                                <div class="bg-white w-6 h-6 rounded-full shadow-md transform duration-300 ease-in-out translate-x-6"></div>
+                            </button>
+                        </div>
+                    </div>
+                     <!-- Exportar -->
+                    <div class="task-card p-4">
+                        <h3 class="text-2xl font-bold mb-4">Opciones de Rutina</h3>
+                        <button onclick="printRoutine()" class="w-full bg-[var(--button-bg)] text-[var(--button-text)] font-bold py-3 rounded-xl shadow-lg hover:opacity-90 transition">
+                            <i class="fas fa-print mr-2"></i>Imprimir Rutina del Día
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Navegación Inferior -->
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto h-20 bg-[var(--bg-secondary)] shadow-[0_-5px_20px_var(--shadow-color)] rounded-t-3xl flex justify-around items-center no-print">
+            <button onclick="showView('tasks')" class="nav-button active" data-view="tasks">
+                <i class="fas fa-home text-3xl"></i>
+                <span class="text-xs block font-semibold">Hoy</span>
             </button>
-            <h2 class="text-2xl md:text-3xl font-bold text-amber-600 mb-2">¡Mis Recompensas!</h2>
-            <p class="text-gray-500 mb-6">Has ganado estas medallas y stickers por tu gran trabajo.</p>
-            <div id="rewards-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-4 max-h-80 overflow-y-auto p-4 bg-amber-50 rounded-lg">
-                <!-- Recompensas desbloqueadas aquí -->
+            <button onclick="showView('library')" class="nav-button" data-view="library">
+                <i class="fas fa-book-open-reader text-3xl"></i>
+                <span class="text-xs block font-semibold">Biblioteca</span>
+            </button>
+            <button onclick="showView('rewards')" class="nav-button" data-view="rewards">
+                <i class="fas fa-star text-3xl"></i>
+                <span class="text-xs block font-semibold">Premios</span>
+            </button>
+            <button onclick="showView('settings')" class="nav-button" data-view="settings">
+                <i class="fas fa-user-cog text-3xl"></i>
+                <span class="text-xs block font-semibold">Ajustes</span>
+            </button>
+        </nav>
+        
+        <!-- Modal para editar/añadir tarea -->
+        <div id="task-modal" class="fixed inset-0 flex items-center justify-center modal-backdrop hidden z-50">
+            <div class="modal-content w-11/12 max-w-sm p-6 rounded-2xl shadow-xl transform scale-95 opacity-0">
+                 <h3 id="modal-title" class="text-2xl font-bold mb-4">Añadir Tarea</h3>
+                 <div id="modal-quick-add">
+                     <input id="task-text-input" type="text" class="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-[var(--button-bg)] outline-none bg-[var(--bg-primary)] mb-4 text-lg" placeholder="Escribe la tarea...">
+                 </div>
+                 <h4 class="text-lg font-semibold mb-2 text-center text-[var(--text-secondary)]">O elige de la biblioteca</h4>
+                 <div id="modal-library-list" class="max-h-40 overflow-y-auto grid grid-cols-3 gap-2 p-2 bg-[var(--bg-primary)] rounded-lg">
+                    <!-- Tareas de la biblioteca para añadir -->
+                 </div>
+                 <div class="flex justify-end space-x-2 mt-4">
+                     <button onclick="closeTaskModal()" class="px-4 py-2 rounded-lg text-[var(--text-secondary)] font-semibold">Cancelar</button>
+                     <button onclick="saveTask()" class="px-5 py-2 rounded-lg bg-[var(--button-bg)] text-[var(--button-text)] font-bold">Guardar</button>
+                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Notificación Toast para Recompensas -->
-    <div id="notification-modal" class="fixed top-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg transform translate-x-[calc(100%+1.25rem)] transition-transform duration-500 z-50 no-print">
-        <p id="notification-text" class="font-bold"></p>
-    </div>
-
-
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const app = document.getElementById('app');
-            const setupModal = document.getElementById('setup-modal');
-            const rewardsModal = document.getElementById('rewards-modal');
-            const startButton = document.getElementById('start-button');
-            const childNameInput = document.getElementById('child-name');
-            const avatarSelection = document.getElementById('avatar-selection');
-            
-            const synth = window.speechSynthesis;
-            let sound;
+        // --- ESTADO DE LA APLICACIÓN ---
+        const appState = {
+            currentView: 'tasks',
+            currentDay: 'Lunes',
+            isNightMode: false,
+            soundEnabled: true,
+            profile: { name: 'Peque', avatar: '🐰' },
+            tasks: {},
+            rewards: {
+                stickers: ['🌟', '💖', '🚀', '🌈', '✅', '👑', '💡', '🏆', '⚽', '🎨', '🎵', '🦕'],
+                collected: []
+            },
+            modalContext: { isEditing: false, timeOfDay: null, taskIndex: null },
+            customTaskTemplates: [],
+        };
+        
+        // --- DATOS CONSTANTES ---
+        const defaultTaskTemplates = [
+            { text: 'Lavarse los dientes', icon: 'fas fa-tooth' }, { text: 'Vestirse', icon: 'fas fa-tshirt' },
+            { text: 'Desayunar', icon: 'fas fa-utensils' }, { text: 'Hacer la cama', icon: 'fas fa-bed' },
+            { text: 'Hacer los deberes', icon: 'fas fa-book' }, { text: 'Ordenar juguetes', icon: 'fas fa-puzzle-piece' },
+            { text: 'Merienda', icon: 'fas fa-apple-alt' }, { text: 'Ponerse el pijama', icon: 'fas fa-moon' },
+            { text: 'Cenar', icon: 'fas fa-concierge-bell' }, { text: 'Leer un cuento', icon: 'fas fa-book-open' },
+            { text: 'Pasear al perro', icon: 'fas fa-dog' }, { text: 'Regar las plantas', icon: 'fas fa-seedling' }
+        ];
 
-            try {
-                // Se envuelve la inicialización de Tone.js en un try-catch.
-                // Si la librería no carga por problemas de red, la app no se romperá.
-                sound = new Tone.Synth({
-                    oscillator: { type: 'sine' },
-                    envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 }
-                }).toDestination();
-            } catch (e) {
-                console.error("Tone.js no se pudo cargar. Las funciones de sonido estarán desactivadas.", e);
-                // Se crea un objeto 'sound' falso para que las llamadas posteriores no fallen.
-                sound = {
-                    triggerAttackRelease: () => {}
-                };
-            }
+        const availableIcons = [
+            'fas fa-star', 'fas fa-heart', 'fas fa-car', 'fas fa-bicycle', 'fas fa-bath', 'fas fa-gamepad',
+            'fas fa-music', 'fas fa-paint-brush', 'fas fa-laptop-code', 'fas fa-umbrella-beach', 'fas fa-tree', 'fas fa-cloud-sun'
+        ];
 
-            const avatars = {
-                bunny: { name: 'Conejito', emoji: '🐰' },
-                bear: { name: 'Osito', emoji: '🐻' },
-                monster: { name: 'Monstruito', emoji: '👾' },
-                dino: { name: 'Dinosaurio', emoji: '🦖' },
+        // --- SONIDOS ---
+        const completeSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'+Array(1e3).join('123'));
+
+        // --- DATOS VISUALES ---
+        const timeOfDayColors = {
+            'AM ☀️': 'var(--accent-4)', // Yellow
+            'PM 🎨': 'var(--accent-2)', // Blue
+            'Noche 🌙': 'var(--accent-1)' // Coral
+        };
+        
+        // --- INICIALIZACIÓN Y DATOS POR DEFECTO ---
+        function initializeDefaultTasks() {
+            const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            const defaultStructure = {
+                'AM ☀️': defaultTaskTemplates.slice(0, 4).map(t => ({...t, completed: false })),
+                'PM 🎨': defaultTaskTemplates.slice(4, 7).map(t => ({...t, completed: false })),
+                'Noche 🌙': defaultTaskTemplates.slice(7, 11).map(t => ({...t, completed: false })),
             };
-            
-            const rewards = [
-                { id: 'star', emoji: '🌟', name: 'Primera Tarea', needed: 1 },
-                { id: 'thumbsup', emoji: '👍', name: 'Buen Comienzo', needed: 5 },
-                { id: 'medal', emoji: '🏅', name: 'Día Completo', needed: 10 },
-                { id: 'rocket', emoji: '🚀', name: 'Súper Rápido', needed: 15 },
-                { id: 'trophy', emoji: '🏆', name: 'Semana Genial', needed: 25 },
-                { id: 'gem', emoji: '💎', name: 'Imparable', needed: 50 },
-                { id: 'crown', emoji: '👑', name: 'Rey/Reina de la Rutina', needed: 100 },
-                 { id: 'heart', emoji: '💖', name: 'Corazón de oro', needed: 125 },
-                { id: 'confetti', emoji: '🎉', name: 'Fiesta de tareas', needed: 150 },
-            ];
+            days.forEach(day => {
+                appState.tasks[day] = JSON.parse(JSON.stringify(defaultStructure));
+            });
+        }
+        
+        // --- FUNCIONES DE RENDERIZADO ---
+        function renderAll() {
+            renderTasks();
+            renderProfile();
+            renderRewards();
+            renderLibrary();
+            updateProgressBar();
+        }
 
-            let state = {
-                childName: '',
-                avatar: 'bunny',
-                currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' }).replace(/^\w/, c => c.toUpperCase()),
-                darkMode: false,
-                tasks: {},
-                completedCount: 0
-            };
-            
-            const defaultTasks = {
-                AM: [
-                    { text: 'Despertar y estirarse', icon: '☀️', done: false },
-                    { text: 'Ir al baño', icon: '🚽', done: false },
-                    { text: 'Lavarse la cara y los dientes', icon: '🦷', done: false },
-                    { text: 'Vestirse', icon: '👕', done: false },
-                    { text: 'Desayunar', icon: '🥣', done: false },
-                ],
-                PM: [
-                    { text: 'Comer', icon: '🥗', done: false },
-                    { text: 'Jugar un rato', icon: '🧸', done: false },
-                    { text: 'Hacer las tareas escolares', icon: '📚', done: false },
-                    { text: 'Ordenar los juguetes', icon: '📦', done: false },
-                ],
-                Noche: [
-                    { text: 'Cenar en familia', icon: '🍽️', done: false },
-                    { text: 'Ponerse el pijama', icon: '🌙', done: false },
-                    { text: 'Lavarse los dientes', icon: '🦷', done: false },
-                    { text: 'Leer un cuento', icon: '📖', done: false },
-                    { text: 'A la cama a descansar', icon: '😴', done: false },
-                ]
-            };
-            
-            const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        function renderTasks() {
+            const container = document.getElementById('task-list-container');
+            const dayTasks = appState.tasks[appState.currentDay];
+            container.innerHTML = '';
 
-            // --- INICIALIZACIÓN ---
-            
-            function initialize() {
-                loadState();
-                renderAvatars();
-                if (state.childName) {
-                    setupModal.style.display = 'none';
-                    renderApp();
-                }
-
-                startButton.addEventListener('click', () => {
-                    const name = childNameInput.value.trim();
-                    const nameError = document.getElementById('name-error');
-
-                    childNameInput.classList.remove('input-error');
-                    nameError.textContent = '';
-                    
-                    if (name === '') {
-                        childNameInput.classList.add('input-error');
-                        nameError.textContent = 'Por favor, ingresa un nombre.';
-                        childNameInput.focus();
-                        return;
-                    }
-
-                    state.childName = name;
-                    const selectedAvatar = document.querySelector('input[name="avatar"]:checked');
-                    if(selectedAvatar) state.avatar = selectedAvatar.value;
-                    
-                    initializeTasksForWeek();
-                    saveState();
-                    setupModal.style.display = 'none';
-                    renderApp();
-                });
+            if (!dayTasks) {
+                container.innerHTML = '<p class="text-center text-[var(--text-secondary)]">No hay tareas para este día.</p>';
+                return;
             }
 
-            function initializeTasksForWeek() {
-                if (Object.keys(state.tasks).length > 0) return;
-                daysOfWeek.forEach(day => {
-                    state.tasks[day] = JSON.parse(JSON.stringify(defaultTasks));
-                });
-            }
+            for (const timeOfDay in dayTasks) {
+                const tasks = dayTasks[timeOfDay];
+                const section = document.createElement('div');
+                section.className = 'task-card p-4';
+                const color = timeOfDayColors[timeOfDay] || 'var(--text-secondary)';
+                section.style.setProperty('--card-color', color);
 
-            // --- LÓGICA DE ESTADO ---
-
-            function saveState() {
-                localStorage.setItem('miRutinaDivertida', JSON.stringify(state));
-            }
-
-            function loadState() {
-                const savedState = localStorage.getItem('miRutinaDivertida');
-                if (savedState) {
-                    state = JSON.parse(savedState);
-                    if(state.darkMode) document.body.classList.add('dark-mode');
-                }
-            }
-
-            // --- RENDERIZADO ---
-
-            function renderApp() {
-                const dayTasks = state.tasks[state.currentDay] || JSON.parse(JSON.stringify(defaultTasks));
-                const totalTasks = dayTasks.AM.length + dayTasks.PM.length + dayTasks.Noche.length;
-                const completedTasks = dayTasks.AM.filter(t => t.done).length + dayTasks.PM.filter(t => t.done).length + dayTasks.Noche.filter(t => t.done).length;
-                const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-
-                app.innerHTML = `
-                    <!-- Header -->
-                    <header class="clay-card p-4 mb-6 text-center no-print">
-                         <div class="flex justify-between items-center mb-4">
-                            <button id="rewards-button" class="text-3xl hover:transform hover:scale-110 transition-transform">🏅</button>
-                            <div class="text-center">
-                                <div class="text-5xl">${avatars[state.avatar].emoji}</div>
-                                <h1 class="text-2xl font-bold text-gray-800">Hola, ${state.childName}!</h1>
+                let taskItemsHTML = tasks.map((task, index) => `
+                    <div class="task-item-wrapper flex items-center justify-between py-3 ${task.completed ? 'completed' : ''}">
+                        <div class="flex items-center gap-4 flex-grow">
+                             <div class="drag-handle text-[var(--text-secondary)] text-lg"><i class="fas fa-grip-vertical"></i></div>
+                            <div class="task-checkbox" onclick="toggleTaskCompletion(this.closest('.task-item-wrapper'), '${timeOfDay}', ${index})">
+                                <i class="fas fa-check"></i>
                             </div>
-                            <div class="flex flex-col items-center space-y-2">
-                                <button id="toggle-dark-mode" class="text-2xl hover:transform hover:scale-110 transition-transform">${state.darkMode ? '☀️' : '🌙'}</button>
-                                <button id="print-button" class="text-2xl hover:transform hover:scale-110 transition-transform">🖨️</button>
+                            <div class="flex items-center gap-3">
+                                <i class="${task.icon} text-2xl w-8 text-center" style="color:${color}"></i>
+                                <span class="task-text text-xl font-medium">${task.text}</span>
                             </div>
                         </div>
-                        <p class="text-gray-500 mb-2">Tu progreso de hoy:</p>
-                        <div class="w-full bg-gray-200 rounded-full h-4">
-                            <div class="bg-gradient-to-r from-yellow-400 to-amber-500 h-4 rounded-full progress-bar-fill" style="width: ${progress}%"></div>
+                        <div class="flex items-center gap-2 no-print">
+                            <button onclick="openTaskModal(true, '${timeOfDay}', ${index})" class="text-[var(--text-secondary)] hover:text-[var(--accent-4)] text-lg"><i class="fas fa-pencil-alt"></i></button>
+                            <button onclick="deleteTask('${timeOfDay}', ${index})" class="text-[var(--text-secondary)] hover:text-[var(--accent-1)] text-lg"><i class="fas fa-trash-alt"></i></button>
+                             <button onclick="speakTask('${task.text}')" class="text-[var(--text-secondary)] hover:text-[var(--accent-2)] text-lg"><i class="fas fa-volume-up"></i></button>
                         </div>
-                    </header>
-
-                    <!-- Selector de Día -->
-                    <div class="flex space-x-2 overflow-x-auto pb-4 mb-6 no-print">
-                        ${daysOfWeek.map(day => `
-                            <button class="day-selector clay-button text-sm sm:text-base font-bold py-2 px-4 whitespace-nowrap ${state.currentDay === day ? 'bg-amber-400 text-white' : 'bg-white'}" data-day="${day}">
-                                ${day}
-                            </button>
-                        `).join('')}
-                    </div>
-                    
-                    <div class="print-header hidden">
-                        <h1 class="text-3xl font-bold">Rutina de ${state.childName}</h1>
-                        <h2 class="text-2xl text-gray-600">${state.currentDay}</h2>
-                    </div>
-
-                    <!-- Listas de Tareas -->
-                    <main class="grid md:grid-cols-3 gap-6">
-                        ${renderTaskList('AM', 'Mañana', dayTasks.AM, 'bg-amber-100')}
-                        ${renderTaskList('PM', 'Tarde', dayTasks.PM, 'bg-sky-100')}
-                        ${renderTaskList('Noche', 'Noche', dayTasks.Noche, 'bg-indigo-100')}
-                    </main>
-                `;
-                addEventListeners();
-            }
-            
-            function renderAvatars() {
-                avatarSelection.innerHTML = Object.keys(avatars).map((key, index) => `
-                    <div class="text-center">
-                        <input type="radio" id="avatar-${key}" name="avatar" value="${key}" class="hidden" ${index === 0 ? 'checked' : ''}>
-                        <label for="avatar-${key}" class="cursor-pointer p-3 rounded-full border-4 border-transparent text-5xl transition-all duration-200 hover:bg-amber-100">
-                            ${avatars[key].emoji}
-                        </label>
-                        <p class="text-sm font-bold">${avatars[key].name}</p>
                     </div>
                 `).join('');
-                
-                // Estilo para el avatar seleccionado
-                document.querySelectorAll('input[name="avatar"]').forEach(radio => {
-                    radio.addEventListener('change', () => {
-                        document.querySelectorAll('label[for^="avatar-"]').forEach(label => {
-                           label.style.borderColor = 'transparent';
-                           label.style.backgroundColor = 'transparent';
-                        });
-                        if(radio.checked) {
-                            const label = document.querySelector(`label[for="${radio.id}"]`);
-                            label.style.borderColor = '#FBBF24'; // amber-400
-                            label.style.backgroundColor = '#FEF3C7'; // amber-100
-                        }
-                    });
-                });
-                 // Aplicar estilo inicial
-                document.querySelector('input[name="avatar"]:checked+label').style.borderColor = '#FBBF24';
-                document.querySelector('input[name="avatar"]:checked+label').style.backgroundColor = '#FEF3C7';
-            }
 
-            function renderTaskList(period, title, tasks, bgColor) {
-                return `
-                    <div class="clay-card p-4">
-                        <h2 class="text-xl font-extrabold text-center mb-4 ${bgColor} rounded-lg py-2">${title}</h2>
-                        <ul class="space-y-3">
-                            ${tasks.map((task, index) => renderTaskItem(task, period, index)).join('')}
-                        </ul>
-                         <div class="mt-4">
-                            <input type="text" id="new-task-${period}" class="w-full p-2 border-2 border-gray-200 rounded-lg" placeholder="Nueva tarea...">
-                            <button class="add-task-btn clay-button bg-green-400 text-white w-full mt-2 py-2 font-bold" data-period="${period}">Añadir Tarea</button>
-                        </div>
+                section.innerHTML = `
+                    <div class="flex justify-between items-center mb-2 px-2">
+                        <h3 class="text-2xl font-bold">${timeOfDay}</h3>
+                        <button onclick="openTaskModal(false, '${timeOfDay}')" class="no-print bg-[var(--button-bg)] text-white w-10 h-10 rounded-full text-2xl font-bold shadow-md hover:opacity-90 transition">+</button>
+                    </div>
+                    <div class="task-list" data-timeofday="${timeOfDay}">
+                        ${taskItemsHTML}
                     </div>
                 `;
+                container.appendChild(section);
             }
+            initializeDragAndDrop();
+        }
+        
+        function renderProfile() {
+            document.getElementById('child-name-display').textContent = appState.profile.name;
+            document.getElementById('avatar-display').textContent = appState.profile.avatar;
+            document.getElementById('child-name-input').value = appState.profile.name;
+        }
 
-            function renderTaskItem(task, period, index) {
-                return `
-                    <li class="task-item flex items-center bg-white p-2 rounded-lg shadow-inner transition-all duration-300 ${task.done ? 'opacity-60' : ''}">
-                        <input type="checkbox" id="task-${period}-${index}" class="hidden task-checkbox" ${task.done ? 'checked' : ''} data-period="${period}" data-index="${index}">
-                        <label for="task-${period}-${index}" class="flex items-center grow cursor-pointer">
-                           <span class="text-3xl mr-3">${task.icon}</span>
-                            <span class="grow text-gray-700 font-semibold" contenteditable="true" data-period="${period}" data-index="${index}">${task.text}</span>
-                            <div class="flex-none w-8 h-8 mr-2 flex items-center justify-center">
-                                <svg class="icon-unchecked w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <svg class="icon-checked hidden w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            </div>
-                        </label>
-                        <button class="speak-btn text-gray-400 hover:text-blue-500 text-xl" data-text="${task.icon} ${task.text}">🔊</button>
-                        <button class="delete-btn text-gray-400 hover:text-red-500 text-xl ml-1" data-period="${period}" data-index="${index}">🗑️</button>
-                    </li>
+        function renderRewards() {
+            const gallery = document.getElementById('stickers-gallery');
+            const noStickersMsg = document.getElementById('no-stickers-msg');
+            gallery.innerHTML = '';
+            noStickersMsg.classList.toggle('hidden', appState.rewards.collected.length > 0);
+
+            appState.rewards.collected.forEach(sticker => {
+                const stickerEl = document.createElement('div');
+                stickerEl.className = 'text-6xl text-center transform hover:scale-125 transition-transform cursor-pointer';
+                stickerEl.textContent = sticker;
+                gallery.appendChild(stickerEl);
+            });
+        }
+        
+        function renderLibrary() {
+            const defaultList = document.getElementById('default-task-list');
+            const customList = document.getElementById('custom-task-list');
+            const iconContainer = document.getElementById('icon-selector-container');
+            const noCustomMsg = document.getElementById('no-custom-tasks-msg');
+
+            defaultList.innerHTML = '';
+            defaultTaskTemplates.forEach(task => {
+                defaultList.innerHTML += createTaskTemplateCard(task);
+            });
+            
+            customList.innerHTML = '';
+            appState.customTaskTemplates.forEach((task, index) => {
+                customList.innerHTML += createTaskTemplateCard(task, true, index);
+            });
+
+            noCustomMsg.classList.toggle('hidden', appState.customTaskTemplates.length > 0);
+
+            iconContainer.innerHTML = '';
+            availableIcons.forEach((icon, index) => {
+                const isSelected = index === 0 ? 'selected' : '';
+                iconContainer.innerHTML += `
+                    <button class="icon-selector-btn border-2 rounded-lg p-2 ${isSelected}" data-icon="${icon}" onclick="selectIcon(this, '${icon}')">
+                        <i class="${icon}"></i>
+                    </button>
                 `;
-            }
+            });
+        }
 
-            function renderRewards() {
-                const unlocked = rewards.filter(r => state.completedCount >= r.needed);
-                const rewardsGrid = document.getElementById('rewards-grid');
-                if (unlocked.length === 0) {
-                     rewardsGrid.innerHTML = `<p class="col-span-full text-gray-500">¡Sigue completando tareas para ganar recompensas!</p>`;
-                } else {
-                    rewardsGrid.innerHTML = unlocked.map(reward => `
-                        <div class="flex flex-col items-center justify-center p-2 bg-white rounded-lg shadow-inner">
-                            <span class="text-5xl">${reward.emoji}</span>
-                            <span class="text-xs font-bold text-center mt-1">${reward.name}</span>
-                        </div>
-                    `).join('');
-                }
+        function createTaskTemplateCard(task, isCustom = false, index = null) {
+            let deleteButton = '';
+            if (isCustom) {
+                deleteButton = `<button onclick="deleteTaskTemplate(${index})" class="absolute top-1 right-1 text-red-300 hover:text-red-500"><i class="fas fa-times-circle"></i></button>`;
+            }
+            return `
+                <div class="relative flex flex-col items-center justify-center text-center p-3 bg-[var(--bg-primary)] rounded-2xl shadow-sm">
+                    <i class="${task.icon} text-3xl text-[var(--accent-1)]"></i>
+                    <span class="mt-2 font-semibold text-sm">${task.text}</span>
+                    ${deleteButton}
+                </div>
+            `;
+        }
+
+        function updateProgressBar() {
+            const dayTasks = appState.tasks[appState.currentDay];
+            if (!dayTasks) return;
+            
+            let totalTasks = 0, completedTasks = 0;
+            for (const timeOfDay in dayTasks) {
+                totalTasks += dayTasks[timeOfDay].length;
+                completedTasks += dayTasks[timeOfDay].filter(t => t.completed).length;
             }
             
-            // --- MANEJADORES DE EVENTOS ---
-            function addEventListeners() {
-                // Selector de Día
-                document.querySelectorAll('.day-selector').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        state.currentDay = e.target.dataset.day;
-                        renderApp();
-                    });
-                });
-                
-                // Checkbox de Tarea
-                document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-                    checkbox.addEventListener('change', (e) => {
-                        const { period, index } = e.target.dataset;
-                        handleTaskCheck(period, parseInt(index), e.target.checked);
-                    });
-                });
+            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').textContent = `${percentage}%`;
 
-                // Añadir Tarea
-                document.querySelectorAll('.add-task-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const period = e.target.dataset.period;
-                        const input = document.getElementById(`new-task-${period}`);
-                        const text = input.value.trim();
-                        if (text) {
-                            state.tasks[state.currentDay][period].push({ text, icon: '✏️', done: false });
-                            input.value = '';
-                            saveAndRerender();
-                        }
-                    });
-                });
-                
-                // Editar Tarea
-                document.querySelectorAll('[contenteditable="true"]').forEach(span => {
-                    span.addEventListener('blur', (e) => {
-                        const { period, index } = e.target.dataset;
-                        const newText = e.target.innerText;
-                        state.tasks[state.currentDay][period][parseInt(index)].text = newText;
-                        saveState();
-                    });
-                     span.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            e.target.blur();
-                        }
-                    });
-                });
-
-                // Borrar Tarea
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', e => {
-                        const {period, index} = e.currentTarget.dataset;
-                        state.tasks[state.currentDay][period].splice(parseInt(index), 1);
-                        saveAndRerender();
-                    })
-                });
-
-                // Leer en voz alta
-                document.querySelectorAll('.speak-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                         const textToSpeak = e.currentTarget.dataset.text;
-                         const utterance = new SpeechSynthesisUtterance(textToSpeak);
-                         utterance.lang = 'es-ES';
-                         synth.speak(utterance);
-                    });
-                });
-
-                // Abrir modal de recompensas
-                document.getElementById('rewards-button').addEventListener('click', () => {
-                    renderRewards();
-                    rewardsModal.style.display = 'flex';
-                });
-                
-                // Cerrar modal de recompensas
-                document.getElementById('close-rewards-button').addEventListener('click', () => {
-                     rewardsModal.style.display = 'none';
-                });
-
-                // Modo oscuro
-                document.getElementById('toggle-dark-mode').addEventListener('click', () => {
-                    state.darkMode = !state.darkMode;
-                    document.body.classList.toggle('dark-mode');
-                    saveAndRerender();
-                });
-
-                // Imprimir
-                document.getElementById('print-button').addEventListener('click', () => {
-                    window.print();
-                });
+            if (percentage === 100 && totalTasks > 0) {
+                giveReward();
             }
+        }
+        
+        // --- LÓGICA DE INTERACCIÓN ---
+        function showView(viewId) {
+            ['tasks-view', 'rewards-view', 'settings-view', 'library-view'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === viewId);
+            });
+            appState.currentView = viewId;
+        }
 
-            function handleTaskCheck(period, index, isDone) {
-                const previouslyDone = state.tasks[state.currentDay][period][index].done;
-                state.tasks[state.currentDay][period][index].done = isDone;
+        function changeDay(btn, day) {
+            appState.currentDay = day;
+            document.getElementById('current-day-title').textContent = day;
+            document.querySelectorAll('.day-selector-btn').forEach(b => {
+                b.classList.remove('active', 'bg-[var(--button-bg)]', 'text-[var(--button-text)]', 'shadow');
+                b.classList.add('text-[var(--text-secondary)]');
+            });
+            btn.classList.add('active', 'bg-[var(--button-bg)]', 'text-[var(--button-text)]', 'shadow');
+            btn.classList.remove('text-[var(--text-secondary)]');
+            renderTasks();
+            updateProgressBar();
+        }
 
-                // Solo celebrar y contar si la tarea se está marcando como hecha
-                if (isDone && !previouslyDone) {
-                    state.completedCount++;
-                    // Efectos visuales y sonoros
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { y: 0.6 }
-                    });
-                    sound.triggerAttackRelease('C4', '8n');
-                    
-                    // Comprobar si se desbloqueó una nueva recompensa
-                    const newlyUnlocked = rewards.find(r => r.needed === state.completedCount);
-                    if (newlyUnlocked) {
-                         showNotification(`¡Nueva recompensa! ${newlyUnlocked.emoji} ${newlyUnlocked.name}`);
-                    }
-                } else if (!isDone && previouslyDone) {
-                    // Si se desmarca, restar del contador
-                    state.completedCount = Math.max(0, state.completedCount - 1);
-                }
-
-                saveAndRerender();
+        function toggleTaskCompletion(taskElement, timeOfDay, index) {
+            const task = appState.tasks[appState.currentDay][timeOfDay][index];
+            task.completed = !task.completed;
+            
+            if (task.completed) {
+                taskElement.classList.add('completed');
+                playCompletionSound();
+                showConfetti(taskElement.querySelector('.task-checkbox'));
+            } else {
+                taskElement.classList.remove('completed');
             }
+            
+            updateProgressBar();
+            saveState();
+        }
 
-            function showNotification(message) {
-                const notificationModal = document.getElementById('notification-modal');
-                const notificationText = document.getElementById('notification-text');
-                if (!notificationModal || !notificationText) return;
-
-                notificationText.innerHTML = message;
-                notificationModal.style.transform = 'translateX(0)';
-
-                setTimeout(() => {
-                    notificationModal.style.transform = 'translateX(calc(100% + 1.25rem))';
-                }, 4000); // Ocultar después de 4 segundos
+        function playCompletionSound() {
+            if (appState.soundEnabled) {
+                completeSound.currentTime = 0;
+                completeSound.play().catch(e => console.log("Error al reproducir sonido:", e));
             }
+        }
 
-            function saveAndRerender() {
+        function showConfetti(targetElement) {
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                document.body.appendChild(confetti);
+                const rect = targetElement.getBoundingClientRect();
+                const startX = rect.left + rect.width / 2;
+                const startY = rect.top + rect.height / 2;
+                
+                const colors = ['var(--accent-1)', 'var(--accent-2)', 'var(--accent-3)', 'var(--accent-4)'];
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                confetti.style.left = `${startX}px`;
+                confetti.style.top = `${startY}px`;
+                
+                const angle = Math.random() * 360;
+                const distance = Math.random() * 80 + 50;
+                const translateX = Math.cos(angle * Math.PI / 180) * distance;
+                const translateY = Math.sin(angle * Math.PI / 180) * distance;
+                const rotation = Math.random() * 720 - 360;
+
+                confetti.animate([
+                    { transform: 'translate(0, 0) rotate(0)', opacity: 1 },
+                    { transform: `translate(${translateX}px, ${translateY}px) rotate(${rotation}deg)`, opacity: 0 }
+                ], {
+                    duration: 800 + Math.random() * 500,
+                    easing: 'cubic-bezier(0.1, 0.9, 0.2, 1)'
+                }).onfinish = () => confetti.remove();
+            }
+        }
+        
+        function giveReward() {
+            const dayKey = `reward_${appState.currentDay}`;
+            if(localStorage.getItem(dayKey)) return;
+
+            const availableStickers = appState.rewards.stickers.filter(s => !appState.rewards.collected.includes(s));
+            if (availableStickers.length > 0) {
+                const newSticker = availableStickers[Math.floor(Math.random() * availableStickers.length)];
+                appState.rewards.collected.push(newSticker);
+                renderRewards();
+                localStorage.setItem(dayKey, 'true');
                 saveState();
-                renderApp();
-            }
+                
+                const stickerNotif = document.createElement('div');
+                stickerNotif.className = 'fixed inset-0 bg-black/50 flex flex-col items-center justify-center z-50 text-center p-4';
+                stickerNotif.innerHTML = `
+                    <div class="text-8xl transform scale-50 opacity-0 animate-pop-in">${newSticker}</div>
+                    <p class="text-white text-3xl font-bold mt-4 opacity-0 animate-fade-in">¡Ganaste un sticker nuevo!</p>
+                `;
+                document.body.appendChild(stickerNotif);
+                
+                stickerNotif.addEventListener('click', () => {
+                     stickerNotif.classList.add('opacity-0');
+                     stickerNotif.addEventListener('transitionend', () => stickerNotif.remove());
+                });
 
-            // Iniciar la aplicación
-            initialize();
+                const styleSheet = document.createElement("style");
+                styleSheet.type = "text/css";
+                styleSheet.innerText = `
+                    @keyframes pop-in { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+                    .animate-pop-in { animation: pop-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
+                    @keyframes fade-in { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+                    .animate-fade-in { animation: fade-in 0.5s ease-out 0.3s forwards; }
+                `;
+                document.head.appendChild(styleSheet);
+            }
+        }
+
+        // --- FUNCIONES DE AJUSTES Y BIBLIOTECA---
+        document.getElementById('child-name-input').addEventListener('change', (e) => {
+            appState.profile.name = e.target.value || 'Peque';
+            renderProfile();
+            saveState();
+        });
+
+        function selectAvatar(btn, avatar) {
+            appState.profile.avatar = avatar;
+            renderProfile();
+            document.querySelectorAll('.avatar-selector').forEach(b => b.classList.remove('bg-orange-200', 'border-orange-400', 'border-2'));
+            btn.classList.add('bg-orange-200', 'border-orange-400', 'border-2');
+            saveState();
+        }
+
+        function toggleNightMode(btn) {
+            appState.isNightMode = !appState.isNightMode;
+            document.body.classList.toggle('dark', appState.isNightMode);
+            const toggle = btn.querySelector('div');
+            toggle.classList.toggle('translate-x-6', appState.isNightMode);
+            btn.classList.toggle('bg-[var(--accent-2)]', appState.isNightMode);
+            btn.classList.toggle('bg-gray-300', !appState.isNightMode);
+            saveState();
+        }
+        
+        function toggleSound(btn) {
+            appState.soundEnabled = !appState.soundEnabled;
+            const toggle = btn.querySelector('div');
+            toggle.classList.toggle('translate-x-6', appState.soundEnabled);
+            btn.classList.toggle('bg-[var(--accent-3)]', appState.soundEnabled);
+            btn.classList.toggle('bg-gray-300', !appState.soundEnabled);
+            saveState();
+        }
+
+        function selectIcon(btn, icon) {
+             document.querySelectorAll('.icon-selector-btn').forEach(b => b.classList.remove('selected'));
+             btn.classList.add('selected');
+        }
+
+        function saveNewTaskTemplate() {
+            const textInput = document.getElementById('new-task-text-input');
+            const text = textInput.value.trim();
+            const selectedIconEl = document.querySelector('.icon-selector-btn.selected');
+            if (!text || !selectedIconEl) {
+                // Podríamos mostrar un mensaje de error aquí
+                return;
+            }
+            const icon = selectedIconEl.dataset.icon;
+            appState.customTaskTemplates.push({ text, icon });
+            
+            textInput.value = ''; // Limpiar input
+            renderLibrary();
+            saveState();
+        }
+
+        function deleteTaskTemplate(index) {
+            appState.customTaskTemplates.splice(index, 1);
+            renderLibrary();
+            saveState();
+        }
+
+        function initializeDragAndDrop() {
+            const lists = document.querySelectorAll('.task-list');
+            lists.forEach(list => {
+                new Sortable(list, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    onEnd: (evt) => {
+                        const timeOfDay = evt.from.dataset.timeofday;
+                        const tasks = appState.tasks[appState.currentDay][timeOfDay];
+                        
+                        const [movedItem] = tasks.splice(evt.oldIndex, 1);
+                        tasks.splice(evt.newIndex, 0, movedItem);
+                        
+                        saveState();
+                        renderTasks(); 
+                    }
+                });
+            });
+        }
+        
+        // --- MODAL DE TAREAS ---
+        function openTaskModal(isEditing, timeOfDay, taskIndex = null) {
+            const modal = document.getElementById('task-modal');
+            const modalContent = modal.querySelector('.modal-content');
+            const title = document.getElementById('modal-title');
+            const input = document.getElementById('task-text-input');
+            const libraryList = document.getElementById('modal-library-list');
+            const quickAddContainer = document.getElementById('modal-quick-add');
+
+
+            appState.modalContext = { isEditing, timeOfDay, taskIndex };
+
+            if (isEditing) {
+                title.textContent = 'Editar Tarea';
+                input.value = appState.tasks[appState.currentDay][timeOfDay][taskIndex].text;
+                quickAddContainer.classList.remove('hidden');
+                libraryList.previousElementSibling.classList.add('hidden');
+                libraryList.classList.add('hidden');
+            } else {
+                title.textContent = `Añadir Tarea`;
+                input.value = '';
+                quickAddContainer.classList.remove('hidden');
+                libraryList.previousElementSibling.classList.remove('hidden');
+                libraryList.classList.remove('hidden');
+
+                // Poblar modal con tareas de la biblioteca
+                libraryList.innerHTML = '';
+                const allTemplates = [...defaultTaskTemplates, ...appState.customTaskTemplates];
+                allTemplates.forEach(template => {
+                    const card = createTaskTemplateCard(template);
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = card;
+                    wrapper.firstElementChild.addEventListener('click', () => {
+                        addTaskFromTemplate(timeOfDay, template);
+                        closeTaskModal();
+                    });
+                    libraryList.appendChild(wrapper);
+                });
+            }
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => modalContent.classList.remove('scale-95', 'opacity-0'), 10);
+            input.focus();
+        }
+
+        function closeTaskModal() {
+            const modalContent = document.querySelector('#task-modal .modal-content');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => document.getElementById('task-modal').classList.add('hidden'), 300);
+        }
+        
+        function saveTask() {
+            const { isEditing, timeOfDay, taskIndex } = appState.modalContext;
+            const text = document.getElementById('task-text-input').value.trim();
+            if (!text) return; // Solo guardar si hay texto en el input
+
+            if (isEditing) {
+                appState.tasks[appState.currentDay][timeOfDay][taskIndex].text = text;
+            } else {
+                // Añadir como tarea rápida con icono por defecto
+                appState.tasks[appState.currentDay][timeOfDay].push({
+                    text: text, icon: 'fas fa-star', completed: false
+                });
+            }
+            renderTasks();
+            updateProgressBar();
+            saveState();
+            closeTaskModal();
+        }
+
+        function addTaskFromTemplate(timeOfDay, template) {
+            appState.tasks[appState.currentDay][timeOfDay].push({
+                ...template,
+                completed: false
+            });
+            renderTasks();
+            updateProgressBar();
+            saveState();
+        }
+
+        function deleteTask(timeOfDay, index) {
+            appState.tasks[appState.currentDay][timeOfDay].splice(index, 1);
+            renderTasks();
+            updateProgressBar();
+            saveState();
+        }
+
+        // --- FUNCIONES EXTRA ---
+        function speakTask(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.error('SpeechSynthesis no soportado');
+            }
+        }
+        
+        function printRoutine() { window.print(); }
+        
+        // --- PERSISTENCIA DE DATOS ---
+        function saveState() {
+            localStorage.setItem('rutinasMagicasState', JSON.stringify(appState));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('rutinasMagicasState');
+            if (savedState) {
+                const parsedState = JSON.parse(savedState);
+                Object.assign(appState, parsedState);
+            } else {
+                initializeDefaultTasks();
+            }
+        }
+
+        // --- ARRANQUE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            if (appState.isNightMode) document.body.classList.add('dark');
+            const today = new Date().toLocaleString('es-ES', { weekday: 'long' });
+            const capitalizedToday = today.charAt(0).toUpperCase() + today.slice(1);
+            const dayButton = Array.from(document.querySelectorAll('.day-selector-btn')).find(b => appState.tasks.hasOwnProperty(capitalizedToday) && b.getAttribute('onclick').includes(capitalizedToday));
+            if (dayButton) {
+                changeDay(dayButton, capitalizedToday);
+            }
+            renderAll();
         });
     </script>
 </body>
