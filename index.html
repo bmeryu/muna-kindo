@@ -6,7 +6,6 @@
     <title>Mi Rutina Divertida</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
@@ -58,8 +57,9 @@
         .dark-mode .bg-green-100 { background-color: #065F46; }
         .dark-mode .bg-purple-100 { background-color: #5B21B6; }
         .dark-mode .day-selector.bg-white { background-color: #374151; }
-        .dark-mode .bg-gray-100 { background-color: #374151; }
-        .dark-mode #settings-modal input, .dark-mode #setup-modal input, .dark-mode #setup-modal select { background-color: #4B5563; border-color: #6B7280; color: #F9FAFB; }
+        .dark-mode .bg-gray-100, .dark-mode .bg-gray-50 { background-color: #374151; }
+        .dark-mode #settings-modal input, .dark-mode #setup-modal input, .dark-mode #setup-modal select, .dark-mode #new-task-AM, .dark-mode #new-task-PM, .dark-mode #new-task-Noche { background-color: #4B5563; border-color: #6B7280; color: #F9FAFB; }
+        .dark-mode .task-item { background-color: #4B5563;}
 
         
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -146,10 +146,7 @@
             };
 
             const synth = window.speechSynthesis;
-            let sound;
-            try { sound = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination(); } 
-            catch (e) { console.error("Tone.js failed", e); sound = { triggerAttackRelease: () => {} }; }
-
+           
             const avatars = { bunny: { name: 'Conejito', emoji: '🐰' }, bear: { name: 'Osito', emoji: '🐻' }, monster: { name: 'Monstruito', emoji: '👾' }, dino: { name: 'Dinosaurio', emoji: '🦖' }, fox: { name: 'Zorro', emoji: '🦊' }, panda: { name: 'Panda', emoji: '🐼' } };
             const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
             let state = {};
@@ -158,12 +155,12 @@
             // --- DATA & STATE ---
             function generateTaskLibrary() {
                 const lib = {
-                    higiene: [{ t: 'Ir al baño y tirar la cadena', i: '🚽' }, { t: 'Lavarse las manos con jabón', i: '🧼' }, { t: 'Lavarse los dientes', i: '🦷' }, { t: 'Peinarse el pelo', i: '🎀' }, { t: 'Darse un baño o ducha', i: '🛁' }],
-                    vestimenta: [{ t: 'Ponerse la ropa de día', i: '👕' }, { t: 'Ponerse el pijama', i: '🌙' }, { t: 'Elegir la ropa para mañana', i: '🤔' }, { t: 'Ponerse los zapatos', i: '👟' }, { t: 'Poner la ropa sucia en el cesto', i: '🧺' }],
-                    comidas: [{ t: 'Desayunar', i: '🥣' }, { t: 'Comer el almuerzo', i: '🥗' }, { t: 'Tomar la merienda', i: '🍎' }, { t: 'Cenar en familia', i: '🍽️' }, { t: 'Ayudar a poner la mesa', i: '🍴' }, { t: 'Beber agua', i: '💧' }],
-                    responsabilidades: [{ t: 'Ordenar los juguetes', i: '📦' }, { t: 'Hacer la cama', i: '🛏️' }, { t: 'Darle comida a la mascota', i: '🐾' }, { t: 'Regar las plantas', i: '🌱' }],
-                    calmaYDescanso: [{ t: 'Leer un cuento', i: '📖' }, { t: 'Momento de tranquilidad', i: '🧘' }, { t: 'Escuchar música relajante', i: '🎶' }, { t: 'Abrazos y mimos', i: '🤗' }, { t: 'Ir a la cama a descansar', i: '😴' }, { t: 'Despertar y estirarse', i: '☀️' }],
-                    juegoYAprendizaje: [{ t: 'Jugar libremente', i: '🧸' }, { t: 'Hacer una manualidad', i: '🎨' }, { t: 'Jugar al aire libre', i: '🌳' }, { t: 'Hacer las tareas de la escuela', i: '📚' }]
+                    higiene: [ { text: 'Ir al baño', img: 'https://static.arasaac.org/pictograms/2959/2959_300.png' }, { text: 'Lavarse las manos', img: 'https://static.arasaac.org/pictograms/3236/3236_300.png' }, { text: 'Lavarse los dientes', img: 'https://static.arasaac.org/pictograms/3235/3235_300.png' }, { text: 'Peinarse', img: 'https://static.arasaac.org/pictograms/3241/3241_300.png' }, { text: 'Ducharse o bañarse', img: 'https://static.arasaac.org/pictograms/2439/2439_300.png' } ],
+                    vestimenta: [ { text: 'Vestirse', img: 'https://static.arasaac.org/pictograms/3245/3245_300.png' }, { text: 'Ponerse el pijama', img: 'https://static.arasaac.org/pictograms/3326/3326_300.png' }, { text: 'Elegir la ropa', img: 'https://static.arasaac.org/pictograms/30739/30739_300.png' }, { text: 'Ponerse los zapatos', img: 'https://static.arasaac.org/pictograms/3248/3248_300.png' }, { text: 'Ropa sucia al cesto', img: 'https://static.arasaac.org/pictograms/4572/4572_300.png' } ],
+                    comidas: [ { text: 'Desayunar', img: 'https://static.arasaac.org/pictograms/2419/2419_300.png' }, { text: 'Comer', img: 'https://static.arasaac.org/pictograms/2364/2364_300.png' }, { text: 'Tomar la merienda', img: 'https://static.arasaac.org/pictograms/3277/3277_300.png' }, { text: 'Cenar', img: 'https://static.arasaac.org/pictograms/2320/2320_300.png' }, { text: 'Poner la mesa', img: 'https://static.arasaac.org/pictograms/3333/3333_300.png' }, { text: 'Beber agua', img: 'https://static.arasaac.org/pictograms/2289/2289_300.png' } ],
+                    responsabilidades: [ { text: 'Ordenar los juguetes', img: 'https://static.arasaac.org/pictograms/3349/3349_300.png' }, { text: 'Hacer la cama', img: 'https://static.arasaac.org/pictograms/2686/2686_300.png' }, { text: 'Comida de la mascota', img: 'https://static.arasaac.org/pictograms/3267/3267_300.png' }, { text: 'Regar las plantas', img: 'https://static.arasaac.org/pictograms/3350/3350_300.png' } ],
+                    calmaYDescanso: [ { text: 'Leer un cuento', img: 'https://static.arasaac.org/pictograms/3108/3108_300.png' }, { text: 'Momento de calma', img: 'https://static.arasaac.org/pictograms/7041/7041_300.png' }, { text: 'Escuchar música', img: 'https://static.arasaac.org/pictograms/2549/2549_300.png' }, { text: 'Abrazar', img: 'https://static.arasaac.org/pictograms/2244/2244_300.png' }, { text: 'Ir a dormir', img: 'https://static.arasaac.org/pictograms/2434/2434_300.png' }, { text: 'Despertar', img: 'https://static.arasaac.org/pictograms/2420/2420_300.png' } ],
+                    juegoYAprendizaje: [ { text: 'Jugar', img: 'https://static.arasaac.org/pictograms/2898/2898_300.png' }, { text: 'Hacer manualidades', img: 'https://static.arasaac.org/pictograms/2795/2795_300.png' }, { text: 'Jugar afuera', img: 'https://static.arasaac.org/pictograms/3201/3201_300.png' }, { text: 'Hacer los deberes', img: 'https://static.arasaac.org/pictograms/2425/2425_300.png' } ]
                 };
                 Object.values(lib).forEach(category => category.forEach(task => { task.stars = 1; }));
                 return lib;
@@ -181,13 +178,8 @@
                 const savedState = localStorage.getItem('miRutinaDivertida_v2');
                 if (savedState) {
                     state = JSON.parse(savedState);
-                    // Garantizar que las nuevas propiedades existan para evitar errores con datos guardados de versiones antiguas
-                    if (state.customRewards === undefined) {
-                        state.customRewards = [];
-                    }
-                    if (state.starBalance === undefined) {
-                        state.starBalance = 0;
-                    }
+                    if (state.customRewards === undefined) { state.customRewards = []; }
+                    if (state.starBalance === undefined) { state.starBalance = 0; }
                     if(state.darkMode) document.body.classList.add('dark-mode');
                 } 
                 else { resetState(); }
@@ -250,11 +242,25 @@
                         <div class="mt-4"><div class="flex space-x-2"><input type="text" id="new-task-${period}" class="w-full p-2 border-2 border-gray-200 rounded-lg" placeholder="Nueva tarea..."><button class="add-task-btn modern-button modern-button-primary px-4" data-period="${period}">+</button></div><button class="open-library-btn modern-button modern-button-secondary w-full mt-2 py-2" data-period="${period}">Añadir de Biblioteca</button></div>
                     </div>`;
             }
-            function renderTaskItem(task, period, index) { return `<li class="task-item flex items-center bg-gray-50 p-2 rounded-lg shadow-sm cursor-move ${task.done ? 'opacity-50' : ''}" draggable="true" data-period="${period}" data-index="${index}"><input type="checkbox" id="task-${period}-${index}" class="hidden task-checkbox" ${task.done ? 'checked' : ''} data-period="${period}" data-index="${index}"><label for="task-${period}-${index}" class="flex items-center grow cursor-pointer"><span class="text-3xl mr-3">${task.i}</span><span class="grow text-gray-700 font-semibold" contenteditable="true" data-period="${period}" data-index="${index}">${task.t}</span><div class="flex-none w-8 h-8 mr-2 flex items-center justify-center"><svg class="icon-unchecked w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><svg class="icon-checked hidden w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div></label><button class="speak-btn text-gray-400 hover:text-blue-500 text-xl" data-text="${task.t}">🔊</button><button class="delete-btn text-gray-400 hover:text-red-500 text-xl ml-1" data-period="${period}" data-index="${index}">🗑️</button></li>`; }
+            function renderTaskItem(task, period, index) { 
+                return `<li class="task-item flex items-center bg-gray-50 p-2 rounded-lg shadow-sm cursor-move ${task.done ? 'opacity-50' : ''}" draggable="true" data-period="${period}" data-index="${index}">
+                            <input type="checkbox" id="task-${period}-${index}" class="hidden task-checkbox" ${task.done ? 'checked' : ''} data-period="${period}" data-index="${index}">
+                            <label for="task-${period}-${index}" class="flex items-center grow cursor-pointer">
+                                <img src="${task.img}" alt="${task.text}" class="w-10 h-10 mr-3 object-contain flex-shrink-0">
+                                <span class="grow text-gray-700 font-semibold" contenteditable="true" data-period="${period}" data-index="${index}">${task.text}</span>
+                                <div class="flex-none w-8 h-8 mr-2 flex items-center justify-center">
+                                    <svg class="icon-unchecked w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <svg class="icon-checked hidden w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </div>
+                            </label>
+                            <button class="speak-btn text-gray-400 hover:text-blue-500 text-xl" data-text="${task.text}">🔊</button>
+                            <button class="delete-btn text-gray-400 hover:text-red-500 text-xl ml-1" data-period="${period}" data-index="${index}">🗑️</button>
+                        </li>`; 
+            }
             function renderAvatars() { $('#avatar-selection').innerHTML = Object.keys(avatars).map((key, i) => `<div><input type="radio" id="avatar-${key}" name="avatar" value="${key}" class="hidden" ${i === 0 ? 'checked' : ''}><label for="avatar-${key}" class="cursor-pointer p-2 rounded-full border-4 border-transparent text-5xl transition-all duration-200 hover:bg-blue-100">${avatars[key].emoji}</label></div>`).join(''); }
             function renderTaskLibrary() {
                 const catNames = { higiene: "Higiene", vestimenta: "Vestimenta", comidas: "Comidas", responsabilidades: "Responsabilidades", calmaYDescanso: "Calma y Descanso", juegoYAprendizaje: "Juego y Aprendizaje" };
-                $('#library-content').innerHTML = Object.keys(taskLibrary).map(cat => `<div class="mb-4"><h3 class="text-lg font-bold text-left text-blue-600 p-1">${catNames[cat]}</h3><div class="flex flex-wrap">${taskLibrary[cat].map(task => `<button class="library-task-btn modern-button bg-white p-2 m-1 flex items-center text-left" data-text="${task.t}" data-icon="${task.i}"><span class="text-2xl mr-2">${task.i}</span><span class="font-semibold">${task.t}</span></button>`).join('')}</div></div>`).join('');
+                $('#library-content').innerHTML = Object.keys(taskLibrary).map(cat => `<div class="mb-4"><h3 class="text-lg font-bold text-left text-blue-600 p-1">${catNames[cat]}</h3><div class="flex flex-wrap">${taskLibrary[cat].map(task => `<button class="library-task-btn modern-button bg-white p-2 m-1 flex items-center text-left" data-text="${task.text}" data-img="${task.img}"><img src="${task.img}" alt="${task.text}" class="w-10 h-10 mr-2 object-contain"><span class="font-semibold">${task.text}</span></button>`).join('')}</div></div>`).join('');
             }
             function renderRewardStore() {
                 const grid = $('#rewards-store-grid');
@@ -277,10 +283,10 @@
                 $$('.add-task-btn').forEach(b => b.addEventListener('click', e => {
                     const period = e.target.dataset.period;
                     const input = $(`#new-task-${period}`);
-                    if (input.value.trim()) { state.tasks[state.currentDay][period].push({ t: input.value.trim(), i: '✏️', done: false, stars: 1 }); input.value = ''; saveAndRender(); }
+                    if (input.value.trim()) { state.tasks[state.currentDay][period].push({ text: input.value.trim(), img: 'https://static.arasaac.org/pictograms/2750/2750_300.png', done: false, stars: 1 }); input.value = ''; saveAndRender(); }
                 }));
                 $$('[contenteditable="true"]').forEach(s => {
-                    s.addEventListener('blur', e => { state.tasks[state.currentDay][e.target.dataset.period][e.target.dataset.index].t = e.target.innerText; saveState(); });
+                    s.addEventListener('blur', e => { state.tasks[state.currentDay][e.target.dataset.period][e.target.dataset.index].text = e.target.innerText; saveState(); });
                     s.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
                 });
                 $$('.delete-btn').forEach(b => b.addEventListener('click', e => { const { period, index } = e.currentTarget.dataset; state.tasks[state.currentDay][period].splice(index, 1); saveAndRender(); }));
@@ -307,7 +313,15 @@
                 document.body.addEventListener('click', e => {
                     if (e.target.matches('.delete-reward-btn')) { state.customRewards.splice(e.target.dataset.index, 1); saveState(); renderCustomRewardsList(); }
                     if (e.target.matches('.redeem-reward-btn')) { const reward = state.customRewards[e.target.dataset.index]; if(state.starBalance >= reward.cost) { state.starBalance -= reward.cost; showNotification(`¡${reward.text} canjeado!`); saveState(); renderRewardStore(); } }
-                    if (e.target.matches('.library-task-btn')) { const { text, icon } = e.target.dataset; const period = modals.library.dataset.period; state.tasks[state.currentDay][period].push({ t: text, i: icon, done: false, stars: 1 }); modals.library.style.display = 'none'; saveAndRender(); }
+                    
+                    const libraryBtn = e.target.closest('.library-task-btn');
+                    if (libraryBtn) { 
+                        const { text, img } = libraryBtn.dataset; 
+                        const period = modals.library.dataset.period; 
+                        state.tasks[state.currentDay][period].push({ text, img, done: false, stars: 1 }); 
+                        modals.library.style.display = 'none'; 
+                        saveAndRender(); 
+                    }
                 });
                 
                 addDragDropListeners();
@@ -319,7 +333,9 @@
                 task.done = isDone;
                 const starValue = task.stars || 1;
                 state.starBalance += isDone ? starValue : -starValue;
-                if (isDone) { confetti({ particleCount: 50, spread: 40, origin: { y: 0.6 } }); sound.triggerAttackRelease('C5', '8n'); }
+                if (isDone) { 
+                    confetti({ particleCount: 50, spread: 40, origin: { y: 0.6 } });
+                }
                 saveAndRender();
             }
             
