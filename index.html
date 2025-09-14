@@ -74,9 +74,10 @@
         }
         .icon-container {
             width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-            border-radius: 12px; font-size: 24px; background-color: #F1F5F9;
+            border-radius: 12px; font-size: 28px; background-color: #F1F5F9;
             box-shadow: inset 2px 2px 4px rgba(0,0,0,0.06), inset -2px -2px 4px rgba(255,255,255,1);
             margin-right: 12px; flex-shrink: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* Efecto 3D para el emoji */
         }
         .dark-mode .task-item {
             background-color: #1F2937; border-color: #374151;
@@ -88,6 +89,7 @@
         .dark-mode .icon-container {
             background-color: #374151;
             box-shadow: inset 2px 2px 4px #111827, inset -2px -2px 4px #4b5563;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); /* Sombra ajustada para modo oscuro */
         }
     </style>
 </head>
@@ -167,9 +169,9 @@
 
             function generateTaskLibrary() {
                 const lib = {
-                    higiene: [ { text: 'Ir al baño', icon: '🚽' }, { text: 'Lavarse las manos', icon: '🧼' }, { text: 'Lavarse los dientes', icon: '🦷' }, { text: 'Peinarse', icon: '🎀' }, { text: 'Ducharse o bañarse', icon: '🛁' } ],
-                    vestimenta: [ { text: 'Vestirse', icon: '👕' }, { text: 'Ponerse el pijama', icon: '🌙' }, { text: 'Elegir la ropa', icon: '🤔' }, { text: 'Ponerse los zapatos', icon: '👟' }, { text: 'Ropa sucia al cesto', icon: '🧺' } ],
-                    comidas: [ { text: 'Desayunar', icon: '🥣' }, { text: 'Comer', icon: '🥗' }, { text: 'Tomar la merienda', icon: '🍎' }, { text: 'Cenar', icon: '🍽️' }, { text: 'Poner la mesa', icon: '🍴' }, { text: 'Beber agua', icon: '💧' } ],
+                    higiene: [ { text: 'Ir al baño', icon: '🚽' }, { text: 'Lavarse las manos', icon: '🧼' }, { text: 'Lavarse los dientes', icon: '🦷' }, { text: 'Peinarse', icon: '🪮' }, { text: 'Ducharse o bañarse', icon: '🛁' } ],
+                    vestimenta: [ { text: 'Vestirse', icon: '👕' }, { text: 'Ponerse el pijama', icon: '🥹' }, { text: 'Elegir la ropa', icon: '🤔' }, { text: 'Ponerse los zapatos', icon: '👟' }, { text: 'Ropa sucia al cesto', icon: '🧺' } ],
+                    comidas: [ { text: 'Desayunar', icon: '🥣' }, { text: 'Comer', icon: '🥪' }, { text: 'Tomar la merienda', icon: '🍎' }, { text: 'Cenar', icon: '🍽️' }, { text: 'Poner la mesa', icon: '🍴' }, { text: 'Beber agua', icon: '💧' } ],
                     responsabilidades: [ { text: 'Ordenar los juguetes', icon: '📦' }, { text: 'Hacer la cama', icon: '🛏️' }, { text: 'Comida de la mascota', icon: '🐾' }, { text: 'Regar las plantas', icon: '🌱' } ],
                     calmaYDescanso: [ { text: 'Leer un cuento', icon: '📖' }, { text: 'Momento de calma', icon: '🧘' }, { text: 'Escuchar música', icon: '🎶' }, { text: 'Abrazar', icon: '🤗' }, { text: 'Ir a dormir', icon: '😴' }, { text: 'Despertar', icon: '☀️' } ],
                     juegoYAprendizaje: [ { text: 'Jugar', icon: '🧸' }, { text: 'Hacer manualidades', icon: '🎨' }, { text: 'Jugar afuera', icon: '🌳' }, { text: 'Hacer los deberes', icon: '📚' } ]
