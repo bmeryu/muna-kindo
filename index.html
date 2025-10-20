@@ -49,7 +49,7 @@ interface AppState {
   currentPage: string;
   actions: {
     addKid: (name: string, avatarUrl: string) => void;
-    setCurrentKidId: (id: string) => void;
+    setCurrentKidId: (id: string | null) => void;
     importDefaults: (kidId: string) => void;
     completeTask: (taskId: string) => void;
     redeemReward: (rewardId: string) => boolean;
@@ -71,13 +71,14 @@ const useAppStore = create<AppState>()(
       rewards: [],
       settings: { soundOn: true, language: 'es', pin: null },
       currentKidId: null,
-      currentPage: '/onboarding',
+      currentPage: '/', // Default to home, logic will show onboarding if needed
       actions: {
         addKid: (name, avatarUrl) => {
           const newKid: Kid = { id: `kid_${Date.now()}`, name, avatarUrl, stars: 0 };
           set((state) => ({ kids: [...state.kids, newKid] }));
           get().actions.setCurrentKidId(newKid.id);
           get().actions.importDefaults(newKid.id);
+          get().actions.setPage('/'); // Go to home screen after adding a kid
         },
         setCurrentKidId: (id) => set({ currentKidId: id }),
         importDefaults: (kidId) => {
@@ -164,9 +165,8 @@ const useAppStore = create<AppState>()(
       },
     }),
     {
-      name: 'mi-pequeno-mundo-storage', // Nombre para el guardado en localStorage
+      name: 'mi-pequeno-mundo-storage',
       storage: createJSONStorage(() => localStorage),
-      // Solo persistimos los datos, no el estado de la UI como la página actual
       partialize: (state) => ({
         kids: state.kids,
         tasks: state.tasks,
@@ -180,7 +180,6 @@ const useAppStore = create<AppState>()(
 
 // --- COMPONENTES DE UI ---
 
-// Un botón grande y amigable, como se pidió.
 const BigButton = ({ children, onClick, className = '' }) => (
   <button
     onClick={onClick}
@@ -190,7 +189,6 @@ const BigButton = ({ children, onClick, className = '' }) => (
   </button>
 );
 
-// Tarjeta para mostrar una tarea. Es grande y se puede tocar en cualquier parte.
 const TaskCard = ({ task, onClick }) => (
   <motion.div
     layout
@@ -215,7 +213,6 @@ const TaskCard = ({ task, onClick }) => (
   </motion.div>
 );
 
-// Tarjeta para mostrar una recompensa.
 const RewardCard = ({ reward, onClick, canAfford }) => (
     <div
         onClick={canAfford ? onClick : null}
@@ -236,7 +233,6 @@ const RewardCard = ({ reward, onClick, canAfford }) => (
 );
 
 
-// Modal que se abre al tocar una tarea.
 const TaskModal = ({ task, onComplete, onCancel }) => (
   <motion.div
     initial={{ opacity: 0 }}
@@ -264,7 +260,6 @@ const TaskModal = ({ task, onComplete, onCancel }) => (
   </motion.div>
 );
 
-// Modal para canjear una recompensa
 const RedeemModal = ({ reward, onRedeem, onCancel }) => (
     <motion.div
         initial={{ opacity: 0 }}
@@ -297,7 +292,6 @@ const RedeemModal = ({ reward, onRedeem, onCancel }) => (
     </motion.div>
 );
 
-// Componente para mostrar confetti al completar una tarea
 const Confetti = () => (
     <div className="fixed inset-0 pointer-events-none z-[100]">
         {[...Array(100)].map((_, i) => (
@@ -317,9 +311,8 @@ const Confetti = () => (
 
 // --- PANTALLAS DE LA APLICACIÓN ---
 
-// Pantalla de Onboarding: para el primer uso.
 const OnboardingScreen = () => {
-  const { addKid, setPage } = useAppStore(state => state.actions);
+  const { addKid } = useAppStore(state => state.actions);
   const [name, setName] = React.useState('');
   const [avatar, setAvatar] = React.useState('https://placehold.co/100x100/a5b4fc/FFFFFF?text=😊');
   const avatars = [
@@ -331,7 +324,6 @@ const OnboardingScreen = () => {
   const handleCreate = () => {
     if (name.trim()) {
       addKid(name.trim(), avatar);
-      setPage('/');
     }
   };
 
@@ -363,7 +355,6 @@ const OnboardingScreen = () => {
   );
 };
 
-// Pantalla principal con el tablero de tareas.
 const HomeScreen = () => {
   const tasks = useAppStore(state => state.tasks);
   const currentKidId = useAppStore(state => state.currentKidId);
@@ -407,7 +398,6 @@ const HomeScreen = () => {
   );
 };
 
-// Pantalla de recompensas
 const RewardsScreen = () => {
     const rewards = useAppStore(state => state.rewards);
     const kids = useAppStore(state => state.kids);
@@ -461,7 +451,6 @@ const RewardsScreen = () => {
     );
 };
 
-// Pantalla del panel de Adulto (simplificado)
 const AdultPanelScreen = () => {
     const pin = useAppStore(state => state.settings.pin);
     const { setPin } = useAppStore(state => state.actions);
@@ -514,91 +503,80 @@ const AdultPanelScreen = () => {
     );
 }
 
+const MainApp = () => {
+    const { kids, currentKidId, currentPage, actions } = useAppStore(state => ({
+        kids: state.kids,
+        currentKidId: state.currentKidId,
+        currentPage: state.currentPage,
+        actions: state.actions,
+    }));
 
-// --- COMPONENTE PRINCIPAL Y NAVEGACIÓN ---
+    // This effect ensures a kid is always selected if any exist.
+    React.useEffect(() => {
+        if (kids.length > 0 && !currentKidId) {
+            actions.setCurrentKidId(kids[0].id);
+        }
+    }, [kids, currentKidId, actions]);
 
-const App = () => {
-  const kids = useAppStore((state) => state.kids);
-  const currentKidId = useAppStore((state) => state.currentKidId);
-  const currentPage = useAppStore((state) => state.currentPage);
-  const actions = useAppStore((state) => state.actions);
+    const currentKid = kids.find(k => k.id === currentKidId);
 
-  React.useEffect(() => {
-    // Si no hay niños, forzamos el onboarding.
-    // Si hay niños pero ninguno seleccionado, seleccionamos el primero.
-    if (kids.length === 0) {
-      actions.setPage('/onboarding');
-    } else if (!currentKidId && kids.length > 0) {
-        actions.setCurrentKidId(kids[0].id);
-        actions.setPage('/');
-    } else if (kids.length > 0 && currentPage === '/onboarding') {
-        actions.setPage('/');
+    if (!currentKid) {
+        return <div className="min-h-screen flex items-center justify-center bg-yellow-50"><p>Cargando perfil...</p></div>;
     }
-  }, [kids, currentKidId, currentPage, actions]);
 
-  const currentKid = kids.find(k => k.id === currentKidId);
+    const renderPage = () => {
+        switch (currentPage) {
+            case '/': return <HomeScreen />;
+            case '/rewards': return <RewardsScreen />;
+            case '/adult': return <AdultPanelScreen />;
+            default: return <HomeScreen />; // Default to home
+        }
+    };
 
-  // Router simple basado en el estado `currentPage`.
-  const renderPage = () => {
-    switch (currentPage) {
-      case '/': return <HomeScreen />;
-      case '/rewards': return <RewardsScreen />;
-      case '/adult': return <AdultPanelScreen />;
-      case '/onboarding':
-      default:
-        return <OnboardingScreen />;
-    }
-  };
-  
-  // No mostramos la app hasta que sepamos si hay un niño o no.
-  if (currentPage === '/onboarding') {
-      return <OnboardingScreen />;
-  }
-
-  if (!currentKid) {
-      // Muestra un loader o un mensaje mientras carga
-      return <div className="min-h-screen flex items-center justify-center bg-yellow-50"><p>Cargando...</p></div>;
-  }
-  
-  return (
-    <div className="max-w-4xl mx-auto bg-yellow-50 min-h-screen font-sans">
-        {/* Header */}
-        <header className="sticky top-0 bg-white/80 backdrop-blur-sm shadow-sm p-4 flex justify-between items-center z-40">
-            <div className="flex items-center gap-3">
-                <img src={currentKid.avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full border-2 border-pink-400" />
-                <div>
-                    <h1 className="font-bold text-lg text-gray-800">{currentKid.name}</h1>
-                    <div className="flex items-center gap-1 text-yellow-500 font-bold">
-                        <span>{currentKid.stars}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
+    return (
+        <div className="max-w-4xl mx-auto bg-yellow-50 min-h-screen font-sans">
+            <header className="sticky top-0 bg-white/80 backdrop-blur-sm shadow-sm p-4 flex justify-between items-center z-40">
+                <div className="flex items-center gap-3">
+                    <img src={currentKid.avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full border-2 border-pink-400" />
+                    <div>
+                        <h1 className="font-bold text-lg text-gray-800">{currentKid.name}</h1>
+                        <div className="flex items-center gap-1 text-yellow-500 font-bold">
+                            <span>{currentKid.stars}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <button onClick={() => actions.setPage('/adult')} className="p-2 rounded-full hover:bg-gray-200">
-                 <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0 3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            </button>
-        </header>
+                <button onClick={() => actions.setPage('/adult')} className="p-2 rounded-full hover:bg-gray-200">
+                     <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0 3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+            </header>
+            <main className="pb-24">{renderPage()}</main>
+            <nav className="fixed bottom-0 left-0 right-0 max-w-4xl mx-auto bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.1)] rounded-t-2xl p-2 flex justify-around items-center">
+                 <button onClick={() => actions.setPage('/')} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${currentPage === '/' ? 'text-pink-500' : 'text-gray-500'}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+                    <span className="text-xs font-bold">Tareas</span>
+                </button>
+                 <button onClick={() => actions.setPage('/rewards')} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${currentPage === '/rewards' ? 'text-pink-500' : 'text-gray-500'}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 5a3 3 0 015.252-2.121l.738.737a.5.5 0 00.708 0l.737-.737A3 3 0 1115 5v2.268a2.5 2.5 0 11-2.5-2.5v-1.25a.5.5 0 00-1 0V5a1.5 1.5 0 103 0V5a2 2 0 10-4 0v2.268a2.5 2.5 0 11-2.5-2.5V3.5a.5.5 0 00-1 0V5a1.5 1.5 0 103 0V5a2 2 0 10-4 0v2.268a2.5 2.5 0 11-2.5-2.5V5zM2.5 10a.5.5 0 000 1h15a.5.5 0 000-1h-15z" clipRule="evenodd" /></svg>
+                    <span className="text-xs font-bold">Premios</span>
+                </button>
+            </nav>
+        </div>
+    );
+}
 
-        <main className="pb-24">
-            {renderPage()}
-        </main>
-        
-        {/* Navegación inferior */}
-        <nav className="fixed bottom-0 left-0 right-0 max-w-4xl mx-auto bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.1)] rounded-t-2xl p-2 flex justify-around items-center">
-             <button onClick={() => actions.setPage('/')} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${currentPage === '/' ? 'text-pink-500' : 'text-gray-500'}`}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
-                <span className="text-xs font-bold">Tareas</span>
-            </button>
-             <button onClick={() => actions.setPage('/rewards')} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${currentPage === '/rewards' ? 'text-pink-500' : 'text-gray-500'}`}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 5a3 3 0 015.252-2.121l.738.737a.5.5 0 00.708 0l.737-.737A3 3 0 1115 5v2.268a2.5 2.5 0 11-2.5-2.5v-1.25a.5.5 0 00-1 0V5a1.5 1.5 0 103 0V5a2 2 0 10-4 0v2.268a2.5 2.5 0 11-2.5-2.5V3.5a.5.5 0 00-1 0V5a1.5 1.5 0 103 0V5a2 2 0 10-4 0v2.268a2.5 2.5 0 11-2.5-2.5V5zM2.5 10a.5.5 0 000 1h15a.5.5 0 000-1h-15z" clipRule="evenodd" /></svg>
-                <span className="text-xs font-bold">Premios</span>
-            </button>
-        </nav>
-    </div>
-  );
+// --- COMPONENTE RAÍZ ---
+const App = () => {
+  // We only check if kids exist. This value is stable and won't cause re-renders unless a kid is added/removed.
+  const kidsExist = useAppStore((state) => state.kids.length > 0);
+
+  // If there are no kids, show the onboarding screen.
+  // Otherwise, show the main application.
+  return kidsExist ? <MainApp /> : <OnboardingScreen />;
 };
+
 
 export default App;
 
